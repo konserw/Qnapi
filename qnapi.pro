@@ -1,10 +1,30 @@
+TEMPLATE = app
+
 CONFIG += warn_on \
  thread \
  qt \
  resources \
  release
-TEMPLATE = app
-SOURCES += src/main.cpp \
+
+QT += network gui core xml widgets
+
+
+#qt http
+INCLUDEPATH += qhttp
+HEADERS += \
+    qhttp/qhttp.h \
+    qhttp/qringbuffer_p.h \
+    qhttp/qhttpauthenticator_p.h
+SOURCES += \
+    qhttp/qhttp.cpp \
+    qhttp/qhttpauthenticator.cpp
+
+#qnapi
+INCLUDEPATH += src
+
+SOURCES += \
+ src/qcumber/qinterprocesschannel.cpp \
+ src/main.cpp \
  src/forms/frmprogress.cpp \
  src/forms/frmabout.cpp \
  src/forms/frmoptions.cpp \
@@ -35,7 +55,10 @@ SOURCES += src/main.cpp \
  src/qopensubtitlesengine.cpp \
  src/qnapilanguage.cpp \
  src/forms/frmopensubtitlesconfig.cpp
-HEADERS += src/forms/frmprogress.h \
+
+HEADERS += \
+ src/qcumber/qinterprocesschannel.h \
+ src/forms/frmprogress.h \
  src/forms/frmabout.h \
  src/forms/frmoptions.h \
  src/forms/frmupload.h \
@@ -72,7 +95,9 @@ HEADERS += src/forms/frmprogress.h \
  src/qopensubtitlesengine.h \
  src/qnapilanguage.h \
  src/forms/frmopensubtitlesconfig.h
-FORMS += ui/frmprogress.ui \
+
+FORMS += \
+ ui/frmprogress.ui \
  ui/frmabout.ui \
  ui/frmoptions.ui \
  ui/frmupload.ui \
@@ -84,13 +109,10 @@ FORMS += ui/frmprogress.ui \
  ui/napiprojekt/frmnapiprojektconfig.ui \
  ui/opensubtitles/frmopensubtitlesconfig.ui \
  ui/frmlistsubtitles.ui
+
 RESOURCES += res/resources.qrc
-QT += network gui core xml
-#UI_DIR = tmp
-#MOC_DIR = tmp
-#RCC_DIR = tmp
-#OBJECTS_DIR = tmp
-INCLUDEPATH += src
+
+##??????
 
  INSTALL_PREFIX =  /usr
  target.path =  $${INSTALL_PREFIX}/bin
@@ -127,7 +149,4 @@ INCLUDEPATH += src
   d3lphin_integration \
   konqueror_integration \
   kde4_integration
-
- SOURCES +=  src/qcumber/qinterprocesschannel.cpp
- HEADERS +=  src/qcumber/qinterprocesschannel.h
 

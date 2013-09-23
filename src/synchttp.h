@@ -24,7 +24,7 @@
 #ifndef ETKSYNCHTTP_H
 #define ETKSYNCHTTP_H
 
-#include <QHttp>
+#include "qhttp.h"
 #include <QEventLoop>
 #include <QBuffer>
 
