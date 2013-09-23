@@ -10,3 +10,9 @@
 *.lai
 *.la
 *.a
+
+~*
+*~
+*.pro.user*
+*.autosave
+
