@@ -15,7 +15,7 @@
 
 #include "frmlistsubtitles.h"
 
-frmListSubtitles::frmListSubtitles(QWidget *parent, Qt::WFlags f)
+frmListSubtitles::frmListSubtitles(QWidget *parent, Qt::WindowFlags f)
 	: QDialog(parent, f)
 {
 	ui.setupUi(this);

@@ -60,7 +60,7 @@ class frmScan: public QDialog
 Q_OBJECT
 
 	public:
-		frmScan(QWidget *parent = 0, Qt::WFlags f = 0);
+		frmScan(QWidget *parent = 0, Qt::WindowFlags f = 0);
 		~frmScan(){};
 
 		void setInitDir(const QString & dir);

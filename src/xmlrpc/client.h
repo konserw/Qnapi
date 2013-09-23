@@ -4,7 +4,7 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#include <qobject.h>
+#include <QObject>
 #include "qhttp.h"
 
 #include "xmlrpc/variant.h"

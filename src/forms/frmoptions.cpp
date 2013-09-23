@@ -15,7 +15,7 @@
 #include "frmoptions.h"
 #include "qnapiapp.h"
 
-frmOptions::frmOptions(QWidget * parent, Qt::WFlags f) : QDialog(parent, f)
+frmOptions::frmOptions(QWidget * parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
 	ui.setupUi(this);
 
