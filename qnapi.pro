@@ -26,7 +26,6 @@ SOURCES += \
  src/qcumber/qinterprocesschannel.cpp \
  src/main.cpp \
  src/forms/frmprogress.cpp \
- src/forms/frmabout.cpp \
  src/forms/frmoptions.cpp \
  src/forms/frmupload.cpp \
  src/forms/frmcorrect.cpp \
@@ -59,7 +58,6 @@ SOURCES += \
 HEADERS += \
  src/qcumber/qinterprocesschannel.h \
  src/forms/frmprogress.h \
- src/forms/frmabout.h \
  src/forms/frmoptions.h \
  src/forms/frmupload.h \
  src/forms/frmcorrect.h \
@@ -98,7 +96,6 @@ HEADERS += \
 
 FORMS += \
  ui/frmprogress.ui \
- ui/frmabout.ui \
  ui/frmoptions.ui \
  ui/frmupload.ui \
  ui/frmcorrect.ui \

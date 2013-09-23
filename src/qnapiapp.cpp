@@ -22,7 +22,6 @@ QNapiApp::QNapiApp(int & argc, char **argv, bool useGui, const QString & appName
 	f_progress = 0;
 	f_options = 0;
 	f_createUser = 0;
-	f_about = 0;
 	f_scan = 0;
 	f_upload = 0;
 	f_correct = 0;
@@ -54,7 +53,6 @@ QNapiApp::~QNapiApp()
 	if(f_progress) delete f_progress;
 	if(f_options) delete f_options;
 	if(f_createUser) delete f_createUser;
-	if(f_about) delete f_about;
 	if(f_scan) delete f_scan;
 	if(f_upload) delete f_upload;
 	if(f_correct) delete f_correct;
@@ -346,15 +344,8 @@ void QNapiApp::showSettings()
 
 void QNapiApp::showAbout()
 {
-	if(!f_about) f_about = new frmAbout();
-	if(f_about->isVisible())
-	{
-		f_about->raise();
-		return;
-	}
-	f_about->exec();
-	delete f_about;
-	f_about = 0;
+
+    //reserved for future use ;)
 }
 
 void QNapiApp::tryQuit()

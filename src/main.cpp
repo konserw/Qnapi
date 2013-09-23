@@ -181,17 +181,12 @@ QStringList parseArgs(int argc, char **argv)
 
 void regSignal()
 {
-#ifdef Q_OS_WIN
-	signal(SIGTERM, sigHandler);
-	signal(SIGINT, sigHandler);
-#else
 	struct sigaction sa;
 	memset(&sa, 0, sizeof(struct sigaction));
 	sigemptyset(&sa.sa_mask);
 	sa.sa_handler = sigHandler;
 	sigaction(SIGTERM, &sa, 0);
 	sigaction(SIGINT, &sa, 0);
-#endif
 }
 
 void sigHandler(int sig)

@@ -27,7 +27,6 @@
 #include "qcumber/qsingleapplication.h"
 
 #include "forms/frmprogress.h"
-#include "forms/frmabout.h"
 #include "forms/frmoptions.h"
 #include "forms/frmupload.h"
 #include "forms/frmcorrect.h"
@@ -90,7 +89,6 @@ class QNapiApp : public QSingleApplication
 		frmProgress *f_progress;
 		frmOptions *f_options;
 		frmCreateUser *f_createUser;
-		frmAbout *f_about;
 		frmScan *f_scan;
 		frmUpload *f_upload;
 		frmCorrect *f_correct;
