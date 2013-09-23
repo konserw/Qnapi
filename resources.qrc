@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file alias="opensubtitles">res/opensubtitles.gif</file>
+        <file alias="qnapi-22-mono">res/qnapi-22-mono.png</file>
+        <file alias="qnapi-48-icon">res/qnapi-48-icon.png</file>
+        <file alias="qnapi-48">res/qnapi-48.png</file>
+        <file alias="qnapi">res/qnapi.png</file>
+    </qresource>
+    <qresource prefix="/languages">
+        <file alias="pl">res/pl.gif</file>
+        <file alias="en">res/en.gif</file>
+    </qresource>
+    <qresource prefix="/ui">
+        <file alias="folder">res/folder.png</file>
+        <file alias="arrow_down">res/arrow_down.png</file>
+        <file alias="arrow_up">res/arrow_up.png</file>
+        <file alias="wrench">res/wrench.png</file>
+        <file alias="info">res/information.png</file>
+        <file alias="film">res/film.png</file>
+        <file alias="accept">res/accept.png</file>
+        <file alias="exclamation">res/exclamation.png</file>
+    </qresource>
+</RCC>

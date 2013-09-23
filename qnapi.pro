@@ -2,12 +2,7 @@ TEMPLATE = app
 
 QT += network xml widgets
 
-CONFIG += warn_on \
-# thread \
- qt \
-# resources \
- release
-
+CONFIG += warn_on qt release
 
 #qt http
 INCLUDEPATH += qhttp
@@ -23,91 +18,91 @@ SOURCES += \
 INCLUDEPATH += src
 
 SOURCES += \
- src/qcumber/qinterprocesschannel.cpp \
- src/main.cpp \
- src/forms/frmprogress.cpp \
- src/forms/frmoptions.cpp \
- src/forms/frmupload.cpp \
- src/forms/frmcorrect.cpp \
- src/forms/frmreport.cpp \
- src/forms/frmscan.cpp \
- src/forms/frmcreateuser.cpp \
- src/forms/frmsummary.cpp \
- src/forms/frmnapiprojektconfig.cpp \
- src/forms/frmlistsubtitles.cpp \
- src/qnapiconfig.cpp \
- src/qnapiapp.cpp \
- src/movieinfo.cpp \
- src/qmultiparthttprequest.cpp \
- src/qcumber/qmanagedrequest.cpp \
- src/qcumber/qmanagedsocket.cpp \
- src/qcumber/qsingleapplication.cpp \
- src/qnapiabstractengine.cpp \
- src/qnapiprojektengine.cpp \
- src/qnapicli.cpp \
- src/qnapiopendialog.cpp \
- src/xmlrpc/client.cpp \
- src/xmlrpc/request.cpp \
- src/xmlrpc/variant.cpp \
- src/xmlrpc/response.cpp \
- src/qnapi.cpp \
- src/qopensubtitlesengine.cpp \
- src/qnapilanguage.cpp \
- src/forms/frmopensubtitlesconfig.cpp
+app/main.cpp \
+app/qnapiconfig.cpp \
+app/qnapiapp.cpp \
+app/movieinfo.cpp \
+app/qmultiparthttprequest.cpp \
+app/qnapiabstractengine.cpp \
+app/qnapiprojektengine.cpp \
+app/qnapicli.cpp \
+app/qnapiopendialog.cpp \
+app/qnapi.cpp \
+app/qopensubtitlesengine.cpp \
+app/qnapilanguage.cpp \
+xmlrpc/client.cpp \
+xmlrpc/request.cpp \
+xmlrpc/variant.cpp \
+xmlrpc/response.cpp \
+forms/frmprogress.cpp \
+forms/frmoptions.cpp \
+forms/frmupload.cpp \
+forms/frmcorrect.cpp \
+forms/frmreport.cpp \
+forms/frmscan.cpp \
+forms/frmcreateuser.cpp \
+forms/frmsummary.cpp \
+forms/frmnapiprojektconfig.cpp \
+forms/frmlistsubtitles.cpp \
+forms/frmopensubtitlesconfig.cpp \
+qcumber/qinterprocesschannel.cpp \
+qcumber/qmanagedrequest.cpp \
+qcumber/qmanagedsocket.cpp \
+qcumber/qsingleapplication.cpp
 
 HEADERS += \
- src/qcumber/qinterprocesschannel.h \
- src/forms/frmprogress.h \
- src/forms/frmoptions.h \
- src/forms/frmupload.h \
- src/forms/frmcorrect.h \
- src/forms/frmreport.h \
- src/forms/frmscan.h \
- src/forms/frmcreateuser.h \
- src/forms/frmsummary.h \
- src/forms/frmnapiprojektconfig.h \
- src/forms/frmlistsubtitles.h \
- src/version.h \
- src/qnapiconfig.h \
- src/qnapiapp.h \
- src/movieinfo.h \
- src/qmultiparthttprequest.h \
- src/qnapithread.h \
- src/synchttp.h \
- src/qcumber/qmanagedrequest.h \
- src/qcumber/qmanagedsocket.h \
- src/qcumber/qsingleapplication.h \
- src/qcumber/qcumber.h \
- src/qnapiabstractengine.h \
- src/qnapiprojektengine.h \
- src/qnapicli.h \
- src/qnapiopendialog.h \
- src/xmlrpc/qsyncxmlrpcclient.h \
- src/xmlrpc/variant.h \
- src/xmlrpc/client.h \
- src/xmlrpc/request.h \
- src/xmlrpc/response.h \
- src/qcheckedlistwidget.h \
- src/qnapi.h \
- src/qnapisubtitleinfo.h \
- src/qopensubtitlesengine.h \
- src/qnapilanguage.h \
- src/forms/frmopensubtitlesconfig.h
+app/version.h \
+app/qnapiconfig.h \
+app/qnapiapp.h \
+app/movieinfo.h \
+app/qmultiparthttprequest.h \
+app/qnapithread.h \
+app/synchttp.h \
+app/qnapiabstractengine.h \
+app/qnapiprojektengine.h \
+app/qnapicli.h \
+app/qnapiopendialog.h \
+app/qcheckedlistwidget.h \
+app/qnapi.h \
+app/qnapisubtitleinfo.h \
+app/qopensubtitlesengine.h \
+app/qnapilanguage.h \
+xmlrpc/qsyncxmlrpcclient.h \
+xmlrpc/variant.h \
+xmlrpc/client.h \
+xmlrpc/request.h \
+xmlrpc/response.h 
+forms/frmprogress.h \
+forms/frmoptions.h \
+forms/frmupload.h \
+forms/frmcorrect.h \
+forms/frmreport.h \
+forms/frmscan.h \
+forms/frmcreateuser.h \
+forms/frmsummary.h \
+forms/frmnapiprojektconfig.h \
+forms/frmlistsubtitles.h \
+forms/frmopensubtitlesconfig.h \
+qcumber/qinterprocesschannel.h \
+qcumber/qmanagedrequest.h \
+qcumber/qmanagedsocket.h \
+qcumber/qsingleapplication.h \
+qcumber/qcumber.h 
 
 FORMS += \
- ui/frmprogress.ui \
- ui/frmoptions.ui \
- ui/frmupload.ui \
- ui/frmcorrect.ui \
- ui/frmreport.ui \
- ui/frmscan.ui \
- ui/frmcreateuser.ui \
- ui/frmsummary.ui \
- ui/napiprojekt/frmnapiprojektconfig.ui \
- ui/opensubtitles/frmopensubtitlesconfig.ui \
- ui/frmlistsubtitles.ui
+forms/frmprogress.ui \
+forms/frmoptions.ui \
+forms/frmupload.ui \
+forms/frmcorrect.ui \
+forms/frmreport.ui \
+forms/frmscan.ui \
+forms/frmcreateuser.ui \
+forms/frmsummary.ui \
+forms/frmnapiprojektconfig.ui \
+forms/frmopensubtitlesconfig.ui \
+forms/frmlistsubtitles.ui
 
-RESOURCES += res/resources.qrc
+RESOURCES += resources.qrc
 
 ##??????
 
