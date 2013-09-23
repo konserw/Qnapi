@@ -40,7 +40,7 @@ void frmListSubtitles::setSubtitlesList(const QList<QNapiSubtitleInfo> & list)
 	ui.twSubtitles->horizontalHeader()->hide();
 	ui.twSubtitles->verticalHeader()->hide();
 	ui.twSubtitles->verticalHeader()->setDefaultSectionSize(20);
-	ui.twSubtitles->verticalHeader()->setResizeMode(QHeaderView::Fixed);
+    ui.twSubtitles->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 
 	int i = 0;
 	foreach(QNapiSubtitleInfo s, list)

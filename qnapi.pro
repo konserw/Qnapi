@@ -1,12 +1,12 @@
 TEMPLATE = app
 
-CONFIG += warn_on \
- thread \
- qt \
- resources \
- release
+QT += network xml widgets
 
-QT += network gui core xml widgets
+CONFIG += warn_on \
+# thread \
+ qt \
+# resources \
+ release
 
 
 #qt http
