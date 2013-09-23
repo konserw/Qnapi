@@ -13,7 +13,7 @@
 *****************************************************************************/
 
 #include "frmopensubtitlesconfig.h"
-#include "../qnapi.h"
+#include "qnapi.h"
 
 frmOpenSubtitlesConfig::frmOpenSubtitlesConfig(QWidget *parent, Qt::WindowFlags f)
 	: QDialog(parent, f)

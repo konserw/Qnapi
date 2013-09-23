@@ -15,7 +15,7 @@ SOURCES += \
     qhttp/qhttpauthenticator.cpp
 
 #qnapi
-INCLUDEPATH += src
+INCLUDEPATH += app
 
 SOURCES += \
 app/main.cpp \
@@ -71,7 +71,7 @@ xmlrpc/qsyncxmlrpcclient.h \
 xmlrpc/variant.h \
 xmlrpc/client.h \
 xmlrpc/request.h \
-xmlrpc/response.h 
+xmlrpc/response.h \
 forms/frmprogress.h \
 forms/frmoptions.h \
 forms/frmupload.h \

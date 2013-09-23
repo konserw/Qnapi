@@ -13,7 +13,7 @@
 *****************************************************************************/
 
 #include "frmnapiprojektconfig.h"
-#include "../qnapi.h"
+#include "qnapi.h"
 
 frmNapiProjektConfig::frmNapiProjektConfig(QWidget *parent, Qt::WindowFlags f)
 	: QDialog(parent, f)
