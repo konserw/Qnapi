@@ -86,22 +86,12 @@ FORMS += ui/frmprogress.ui \
  ui/frmlistsubtitles.ui
 RESOURCES += res/resources.qrc
 QT += network gui core xml
-UI_DIR = tmp
-MOC_DIR = tmp
-RCC_DIR = tmp
-OBJECTS_DIR = tmp
-INCLUDEPATH = src
-macx {
- QMAKE_MAC_SDK =  /Developer/SDKs/MacOSX10.4u.sdk
- CONFIG +=  x86  ppc
- ICON =  macx/qnapi.icns
- QMAKE_INFO_PLIST =  macx/Info.plist
- TARGET =  QNapi
- 7ZIP_BINARY.files =  macx/7za
- 7ZIP_BINARY.path =  Contents/Resources
- QMAKE_BUNDLE_DATA +=  7ZIP_BINARY
-}
-unix {
+#UI_DIR = tmp
+#MOC_DIR = tmp
+#RCC_DIR = tmp
+#OBJECTS_DIR = tmp
+INCLUDEPATH += src
+
  INSTALL_PREFIX =  /usr
  target.path =  $${INSTALL_PREFIX}/bin
  doc.path =  $${INSTALL_PREFIX}/share/doc/$${TARGET}
@@ -137,13 +127,7 @@ unix {
   d3lphin_integration \
   konqueror_integration \
   kde4_integration
-}
-win32 {
- RC_FILE =  win32/qnapi.rc
- SOURCES +=  src/qcumber/qinterprocesschannel_win32.cpp
- HEADERS +=  src/qcumber/qinterprocesschannel_win32.h
-}
-!win32 {
+
  SOURCES +=  src/qcumber/qinterprocesschannel.cpp
  HEADERS +=  src/qcumber/qinterprocesschannel.h
-}
+

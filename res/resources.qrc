@@ -1,23 +1,23 @@
 <RCC>
-  <qresource prefix="/icon" >
-    <file>opensubtitles.gif</file>
-    <file>qnapi-22-mono.png</file>
-    <file>qnapi-48-icon.png</file>
-    <file>qnapi-48.png</file>
-    <file>qnapi.png</file>
-  </qresource>
-  <qresource prefix="/languages" >
-    <file>pl.gif</file>
-    <file>en.gif</file>
-  </qresource>
-  <qresource prefix="/ui" >
-    <file>folder.png</file>
-    <file>arrow_down.png</file>
-    <file>arrow_up.png</file>
-    <file>wrench.png</file>
-    <file>information.png</file>
-    <file>film.png</file>
-    <file>accept.png</file>
-    <file>exclamation.png</file>
-  </qresource>
+    <qresource prefix="/icon">
+        <file alias="opensubtitles">opensubtitles.gif</file>
+        <file alias="qnapi-22-mono">qnapi-22-mono.png</file>
+        <file alias="qnapi-48-icon">qnapi-48-icon.png</file>
+        <file alias="qnapi-48">qnapi-48.png</file>
+        <file alias="qnapi">qnapi.png</file>
+    </qresource>
+    <qresource prefix="/languages">
+        <file alias="pl">pl.gif</file>
+        <file alias="en">en.gif</file>
+    </qresource>
+    <qresource prefix="/ui">
+        <file alias="folder">folder.png</file>
+        <file alias="arrow_down">arrow_down.png</file>
+        <file alias="arrow_up">arrow_up.png</file>
+        <file alias="wrench">wrench.png</file>
+        <file alias="info">information.png</file>
+        <file alias="film">film.png</file>
+        <file alias="accept">accept.png</file>
+        <file alias="exclamation">exclamation.png</file>
+    </qresource>
 </RCC>
