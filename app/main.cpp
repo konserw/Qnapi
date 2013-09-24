@@ -126,24 +126,12 @@ int main(int argc, char **argv)
 			}
 		}
 
-		// Jesli nie dzialamy w trybie pobierania, mozemy ew. utworzyc ikone w tray-u
-		// badz pokazac okno wyboru plikow z filmami
+        // Jesli nie dzialamy w trybie pobierania, mozemy pokazac okno wyboru plikow z filmami
 		if(!app.progress()->isBatchMode())
 		{
-			// Jesli nie ma traya, od razu wyswietlamy okienko z wyborem pliku
-			if(!QSystemTrayIcon::isSystemTrayAvailable())
-			{
-				if(!app.progress()->isBatchMode())
-				{
-					app.progress()->setBatchMode(true);
-					if(!app.showOpenDialog())
-						return 1;
-				}
-			}
-			else // Jesli ikona w tray-u jest obsligiwana, tworzymy ja
-			{
-				app.createTrayIcon();
-			}
+            app.progress()->setBatchMode(true);
+            if(!app.showOpenDialog())
+                return 1;
 		}
 
 		return app.exec();

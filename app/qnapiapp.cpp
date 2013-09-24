@@ -354,14 +354,6 @@ void QNapiApp::tryQuit()
 	quit();
 }
 
-void QNapiApp::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
-{
-	if(reason == QSystemTrayIcon::Trigger)
-#ifndef Q_WS_MAC
-		showOpenDialog()
-#endif
-	;
-}
 
 bool QNapiApp::event(QEvent *ev)
 {

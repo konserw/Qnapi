@@ -136,7 +136,7 @@ bool QNapiProjektEngine::lookForSubtitles(QString lang)
 										urlTxt,
 										QFileInfo(movie).completeBaseName(),
 										"",
-										"txt",
+                                        "srt",
 										SUBTITLE_UNKNOWN);
 
 	return (subtitlesList.size() > 0);

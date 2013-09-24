@@ -93,11 +93,6 @@ class QNapiApp : public QSingleApplication
 		frmUpload *f_upload;
 		frmCorrect *f_correct;
 		frmReport *f_report;
-
-	private slots:
-
-		void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
-
 };
 
 #endif
