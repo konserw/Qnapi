@@ -73,27 +73,7 @@ bool QNapiAbstractEngine::match()
 			QFile::remove(subtitles);
 	}
 
-	bool r = false;
-
-#ifdef Q_WS_WIN
-	// Pod windowsem, aby "wyczyscic" atrybuty pliku, tworzymy go na nowo
-	QFile f(subtitles), f2(subtitlesTmp);
-	if(!f.open(QIODevice::WriteOnly) || !f2.open(QIODevice::ReadOnly))
-	{
-		f.close();
-	}
-	else
-	{
-		r = f.write(f2.readAll()) > 0;
-		f2.close();
-		f.close();
-	}
-#else
-	// pod normalnymi OS-ami nie trzeba sie gimnastykowac z atrybutami
-	r = QFile::copy(subtitlesTmp, subtitles);
-#endif
-
-	return r;
+    return QFile::copy(subtitlesTmp, subtitles);
 }
 
 // Dokonuje post-przetwarzania pliku z napisami (na podstawie konfiguracji)
@@ -118,7 +98,6 @@ void QNapiAbstractEngine::pp()
 		}
 	}
 
-#ifndef Q_WS_WIN
 	// Zmiana uprawnien do pliku
 	if(GlobalConfig().ppChangePermissions())
 	{
@@ -134,7 +113,6 @@ void QNapiAbstractEngine::pp()
 			ppChangeSubtitlesPermissions(QFile::Permissions(perm));
 		}
 	}
-#endif
 }
 
 QString QNapiAbstractEngine::ppDetectEncoding(const QString & fileName, int testBufferSize)
