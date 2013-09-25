@@ -33,7 +33,7 @@ class QNapiAbstractEngine
 public:
 
 	// destruktor
-	virtual ~QNapiAbstractEngine() {};
+    virtual ~QNapiAbstractEngine() {}
 
 	// ustawia sciezke do pliku filmowego
 	void setMoviePath(const QString & path);
@@ -50,6 +50,9 @@ public:
 	// dokonuje przetwarzania napisow
 	void pp();
 
+    // konwersja na srt
+    bool convert();
+
 	// probuje wykrywac (polskie) kodowanie znakow w pliku tekstowym
 	QString ppDetectEncoding(const QString & fileName, int testBufferSize = 10240);
 	// zmienia kodowanie znakow w pobranych napisach
@@ -58,10 +61,8 @@ public:
 	bool ppChangeSubtitlesEncoding(const QString & to);
 	// usuwa linie z pliku zawierajace conajmniej jedno z podanej listy slow
 	bool ppRemoveLinesContainingWords(QStringList wordList);
-#ifndef Q_WS_WIN
 	// zmienia uprawnienia do pliku z napisami
 	bool ppChangeSubtitlesPermissions(QFile::Permissions permissions);
-#endif
 
 	// powinna zwracac nazwe modulu
 	virtual QString engineName() = 0;
@@ -106,12 +107,7 @@ protected:
 	bool noBackup;
 
 	// konstruktor klasy
-	QNapiAbstractEngine(const QString & movieFile = "", const QString & subtitlesFile = "") 
-		: movie(movieFile), subtitles(subtitlesFile)
-	{
-		tmpPath = GlobalConfig().tmpPath();
-		noBackup = GlobalConfig().noBackup();
-	};
+    QNapiAbstractEngine(const QString & movieFile = "", const QString & subtitlesFile = "");
 
 	// generuje nazwe dla pliku tymczasowego
 	QString generateTmpFileName();

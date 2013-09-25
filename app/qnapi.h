@@ -71,6 +71,8 @@ class QNapi
 		bool match();
 		// wykonuje przetwarzanie na dopasowanych napisach
 		void pp();
+        // konwersja na srt
+        void convert();
 
 		// czysci rozne smieci i pliki tymczasowe
 		void cleanup();

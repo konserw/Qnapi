@@ -4,6 +4,10 @@ QT += network xml widgets
 
 CONFIG += warn_on qt release
 
+#python
+INCLUDEPATH += /usr/include/python2.7
+LIBS += -lpthread -ldl -lutil -lm -lpython2.7
+
 #qt http
 INCLUDEPATH += qhttp
 HEADERS += \

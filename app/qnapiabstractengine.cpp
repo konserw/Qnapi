@@ -15,7 +15,7 @@
 #include "qnapiabstractengine.h"
 
 #include <QFlags>
-
+#include <Python.h>
 
 // ustawia sciezke do pliku filmowego
 void QNapiAbstractEngine::setMoviePath(const QString & path)
@@ -112,7 +112,37 @@ void QNapiAbstractEngine::pp()
 			perm |= (permInt & 0007);
 			ppChangeSubtitlesPermissions(QFile::Permissions(perm));
 		}
-	}
+    }
+}
+
+bool QNapiAbstractEngine::convert()
+{
+
+    QFileInfo stf(subtitlesTmp);
+
+    if(!stf.exists())
+        return false;
+
+    QFileInfo mf(movie);
+
+    subtitles = mf.path() + "/" + mf.completeBaseName() + ".srt";
+
+    QString program =
+            "import os\n"
+            "import sys\n"
+            "sys.path.append(\"/home/konserw/git/Qnapi/aeidon\")\n"
+            "os.system(\"__init__.py\")\n"
+            "project = aeidon.Project()\n"
+            "project.open_main(\"%1\", \"utf_8\")\n"
+            "project.set_framerate(aeidon.framerates.FPS_23_976)\n"
+            "project.save_main(aeidon.files.new(aeidon.formats.SubRip,\"%2\",\"utf_8\"))\n";
+
+    Py_SetProgramName(const_cast<char*>(qApp->applicationFilePath().toStdString().c_str()));  /* optional but recommended */
+    Py_Initialize();
+    PyRun_SimpleString(program.arg(subtitlesTmp).arg(subtitles).toStdString().c_str());
+    Py_Finalize();
+
+    return true;
 }
 
 QString QNapiAbstractEngine::ppDetectEncoding(const QString & fileName, int testBufferSize)
@@ -188,8 +218,7 @@ bool QNapiAbstractEngine::ppChangeSubtitlesEncoding(const QString & from, const 
 	return true;
 }
 
-// Konwertuje napisy z jednego kodowania na inne, dokonujac proby autodetekcji
-// kodowania zrodlowego
+// Konwertuje napisy z jednego kodowania na inne, dokonujac proby autodetekcji kodowania zrodlowego
 bool QNapiAbstractEngine::ppChangeSubtitlesEncoding(const QString & to)
 {
 	if(!QFileInfo(subtitles).exists())
@@ -268,16 +297,22 @@ bool QNapiAbstractEngine::ppRemoveLinesContainingWords(QStringList wordList)
 	return true;
 }
 
-#ifndef Q_WS_WIN
 // Zmienia uprawnienia do pliku z napisami
 bool QNapiAbstractEngine::ppChangeSubtitlesPermissions(QFile::Permissions permissions)
 {
 	if(!QFileInfo(subtitles).exists())
 		return false;
 
-	return QFile::setPermissions(subtitles, permissions);
+    return QFile::setPermissions(subtitles, permissions);
 }
-#endif
+
+//konstruktor
+QNapiAbstractEngine::QNapiAbstractEngine(const QString &movieFile, const QString &subtitlesFile)
+    : movie(movieFile), subtitles(subtitlesFile)
+{
+    tmpPath = GlobalConfig().tmpPath();
+    noBackup = GlobalConfig().noBackup();
+}
 
 // generuje nazwe dla pliku tymczasowego
 QString QNapiAbstractEngine::generateTmpFileName()

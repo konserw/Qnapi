@@ -205,7 +205,12 @@ bool QNapi::match()
 
 void QNapi::pp()
 {
-	if(currentEngine) currentEngine->pp();
+    if(currentEngine) currentEngine->pp();
+}
+
+void QNapi::convert()
+{
+    if(currentEngine) currentEngine->convert();
 }
 
 void QNapi::cleanup()
