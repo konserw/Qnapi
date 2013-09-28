@@ -19,10 +19,6 @@
 #include <QUrl>
 #include <QMessageBox>
 
-#ifdef Q_WS_WIN // for SetFileAttributes
-#include <windows.h>
-#endif
-
 #include <cmath>
 
 #include "qnapiabstractengine.h"
@@ -61,6 +57,9 @@ public:
 
 	QNapiProjektEngine(const QString & movieFile = "", const QString & subtitlesFile = "");
 	~QNapiProjektEngine();
+
+    bool match()
+    { return QNapiAbstractEngine::convert(); }
 
 	// zwraca nazwe modulu
 	QString engineName();

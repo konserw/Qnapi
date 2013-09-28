@@ -2,11 +2,12 @@ TEMPLATE = app
 
 QT += network xml widgets
 
-CONFIG += warn_on qt release
+CONFIG += qt release warn_on
 
 #python
-INCLUDEPATH += /usr/include/python2.7
-LIBS += -lpthread -ldl -lutil -lm -lpython2.7
+#INCLUDEPATH += /usr/include/python3.3m
+#LIBS += -lpthread -ldl -lutil -lm -lpython3.3m
+#QMAKE_CXXFLAGS += -fms-extensions -std=c++03
 
 #qt http
 INCLUDEPATH += qhttp

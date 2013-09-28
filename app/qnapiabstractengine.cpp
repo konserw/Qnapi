@@ -13,9 +13,10 @@
 *****************************************************************************/
 
 #include "qnapiabstractengine.h"
-
+#include "movieinfo.h"
 #include <QFlags>
-#include <Python.h>
+#include <QFile>
+#include <QTextStream>
 
 // ustawia sciezke do pliku filmowego
 void QNapiAbstractEngine::setMoviePath(const QString & path)
@@ -117,30 +118,43 @@ void QNapiAbstractEngine::pp()
 
 bool QNapiAbstractEngine::convert()
 {
-
-    QFileInfo stf(subtitlesTmp);
-
-    if(!stf.exists())
+    if(!QFile::exists(subtitlesTmp))
         return false;
 
     QFileInfo mf(movie);
-
     subtitles = mf.path() + "/" + mf.completeBaseName() + ".srt";
 
-    QString program =
-            "import os\n"
-            "import sys\n"
-            "sys.path.append(\"/home/konserw/git/Qnapi/aeidon\")\n"
-            "os.system(\"__init__.py\")\n"
-            "project = aeidon.Project()\n"
-            "project.open_main(\"%1\", \"utf_8\")\n"
-            "project.set_framerate(aeidon.framerates.FPS_23_976)\n"
-            "project.save_main(aeidon.files.new(aeidon.formats.SubRip,\"%2\",\"utf_8\"))\n";
+    QString framerate;
+    MovieInfo info(movie);
+    if(info.isErr)
+        framerate = "FPS_23_976";
+    else
+    {
+        if(info.fps < 24) framerate = "FPS_23_976";
+        else if(info.fps < 24.5) framerate = "FPS_24_000";
+        else if(info.fps < 27) framerate = "FPS_25_000";
+        else framerate = "FPS_29_970";
+    }
 
-    Py_SetProgramName(const_cast<char*>(qApp->applicationFilePath().toStdString().c_str()));  /* optional but recommended */
-    Py_Initialize();
-    PyRun_SimpleString(program.arg(subtitlesTmp).arg(subtitles).toStdString().c_str());
-    Py_Finalize();
+    QFile f(":/scripts/convert");
+    f.open(QFile::ReadOnly);
+    QTextStream str(&f);
+
+    QString program = str.readAll().arg(subtitlesTmp).arg(subtitles).arg(framerate);
+
+    scriptPath = qApp->applicationDirPath() + "/convert.py";
+    QFile ff(scriptPath);
+    if(!ff.open(QFile::WriteOnly | QFile::Truncate))
+    {
+        return false;
+    }
+    QTextStream out(&ff);
+    out << program;
+    ff.close();
+
+    QProcess process;
+    process.start("python3", QStringList() << scriptPath);
+    process.waitForFinished(-1);
 
     return true;
 }

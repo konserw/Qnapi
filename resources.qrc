@@ -20,4 +20,7 @@
         <file alias="accept">res/accept.png</file>
         <file alias="exclamation">res/exclamation.png</file>
     </qresource>
+    <qresource prefix="/scripts">
+        <file alias="convert">res/convert.py</file>
+    </qresource>
 </RCC>

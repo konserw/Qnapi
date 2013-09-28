@@ -45,13 +45,13 @@ public:
 	QString subtitlesPath();
 
 	// dopasowuje napisy do pliku z filmem
-	bool match();
+  /*  virtual*/ bool match();
 
 	// dokonuje przetwarzania napisow
 	void pp();
 
     // konwersja na srt
-    bool convert();
+    virtual bool convert();
 
 	// probuje wykrywac (polskie) kodowanie znakow w pliku tekstowym
 	QString ppDetectEncoding(const QString & fileName, int testBufferSize = 10240);
@@ -100,6 +100,8 @@ protected:
 	QString subtitlesTmp;
 	// sciezka do katalogu tymczasowego
 	QString tmpPath;
+    // sciezka do pliku skryptu konwertujacego
+    QString scriptPath;
 	// suma kontrolna pliku filmowego
 	QString checkSum;
 	// okresla czy uzytkownik wylaczyl wykonywanie kopii zapasowej, gdy napisy do

@@ -184,6 +184,8 @@ void QNapiProjektEngine::cleanup()
 		QFile::remove(tmpPackedFile);
 	if(QFile::exists(subtitlesTmp))
 		QFile::remove(subtitlesTmp);
+    if(QFile::exists(scriptPath))
+        QFile::remove(scriptPath);
 }
 
 // Tworzy konto uzytkownika na serwerze NAPI
@@ -273,10 +275,7 @@ QNapiProjektEngine::UploadResult
 		QFile::remove(zipFileName);
 
 	QStringList args;
-	args << "a" << "-t7z" << "-bd" << "-y";
-#ifndef Q_WS_WIN
-	args << "-l";
-#endif
+    args << "a" << "-t7z" << "-bd" << "-y" << "-l";
 	args << zipFileName << (QString("-p")+napiZipPassword) << newSubtitlesName;
 
 	QProcess p7zip;

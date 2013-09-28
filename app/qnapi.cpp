@@ -200,7 +200,8 @@ bool QNapi::unpack()
 
 bool QNapi::match()
 {
-	return currentEngine ? currentEngine->match() : false;
+  //  return currentEngine ? currentEngine->match() : false;
+    return convert();
 }
 
 void QNapi::pp()
@@ -208,9 +209,9 @@ void QNapi::pp()
     if(currentEngine) currentEngine->pp();
 }
 
-void QNapi::convert()
+bool QNapi::convert()
 {
-    if(currentEngine) currentEngine->convert();
+    return currentEngine ? currentEngine->convert() : false;
 }
 
 void QNapi::cleanup()
