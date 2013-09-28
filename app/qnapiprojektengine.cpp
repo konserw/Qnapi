@@ -186,6 +186,7 @@ void QNapiProjektEngine::cleanup()
 		QFile::remove(subtitlesTmp);
     if(QFile::exists(scriptPath))
         QFile::remove(scriptPath);
+
 }
 
 // Tworzy konto uzytkownika na serwerze NAPI

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-//my license and desc placeholder
+copyright (c) 2013 by Kamil Strzempowicz
 """
-
+"""
 import sys
-
-sys.path.append("/home/konserw/git/Qnapi/")
+sys.path.append("/home/konserw/git/Qnapi/"
+"""
 
 import aeidon
 from aeidon import *

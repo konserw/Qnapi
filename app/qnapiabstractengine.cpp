@@ -153,7 +153,7 @@ bool QNapiAbstractEngine::convert()
     ff.close();
 
     QProcess process;
-    process.start("python3", QStringList() << scriptPath);
+    process.start("python", QStringList() << scriptPath);
     process.waitForFinished(-1);
 
     return true;
