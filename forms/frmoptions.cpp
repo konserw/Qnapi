@@ -19,25 +19,7 @@ frmOptions::frmOptions(QWidget * parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
 	ui.setupUi(this);
 
-#ifdef Q_WS_MAC
-	if ( QSysInfo::MacintoshVersion == QSysInfo::MV_10_5) // bo na Leopardzie nie ma juz stylu BM
-	{
-		ui.cbUseBrushedMetal->setText(tr("Używaj ciemnego stylu (Mac OS X Leopard)"));
-	}
-
-	setAttribute(Qt::WA_MacBrushedMetal, GlobalConfig().useBrushedMetal());
-#else
 	ui.cbUseBrushedMetal->hide();
-#endif
-
-#ifdef Q_WS_WIN
-	// Pod Windowsami chowamy kontrolki odpowiadajace za zmiane uprawnien - i tak sie nie przydadza
-	ui.cbChangePermissions->hide();
-	ui.sbOPerm->hide();
-	ui.sbGPerm->hide();
-	ui.sbUPerm->hide();
-#endif
-
 
 	QString tlcode;
 	foreach(QString lang, QNapiLanguage("").listLanguages())
