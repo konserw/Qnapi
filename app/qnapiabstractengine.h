@@ -33,7 +33,7 @@ class QNapiAbstractEngine
 public:
 
 	// destruktor
-    virtual ~QNapiAbstractEngine() {}
+    virtual ~QNapiAbstractEngine();
 
 	// ustawia sciezke do pliku filmowego
 	void setMoviePath(const QString & path);
@@ -47,18 +47,9 @@ public:
 	// dopasowuje napisy do pliku z filmem
   /*  virtual*/ bool match();
 
-	// dokonuje przetwarzania napisow
-	void pp();
-
     // konwersja na srt
     virtual bool convert();
 
-	// probuje wykrywac (polskie) kodowanie znakow w pliku tekstowym
-	QString ppDetectEncoding(const QString & fileName, int testBufferSize = 10240);
-	// zmienia kodowanie znakow w pobranych napisach
-	bool ppChangeSubtitlesEncoding(const QString & from, const QString & to);
-	// zmienia kodowanie znakow w napisach na podane, dokonujac autodetekcji kodowania zrodlowgo
-	bool ppChangeSubtitlesEncoding(const QString & to);
 	// usuwa linie z pliku zawierajace conajmniej jedno z podanej listy slow
 	bool ppRemoveLinesContainingWords(QStringList wordList);
 	// zmienia uprawnienia do pliku z napisami
@@ -70,10 +61,6 @@ public:
 	virtual QString engineInfo() = 0;
 	// zwraca ikone silnika pobierania
 	virtual QIcon engineIcon() = 0;
-	// zwraca czy silnik jest konfigurowalny
-	virtual bool isConfigurable() = 0;
-	// wywoluje okienko konfiguracji
-	virtual void configure(QWidget * parent) = 0;
 
 	// powinna obliczac i zwracac sume kontrolna pliku filmowego,
 	// a takze ustawiac wartosc zmiennej checkSym
@@ -84,12 +71,12 @@ public:
 	virtual QList<QNapiSubtitleInfo> listSubtitles() = 0;
 	// powinna pobierac napisy do filmu i zapisywac w jakims pliku tymczasowym
 	virtual bool download(int idx) = 0;
-	// powinna rozpakowywac pobrane napisy, a ich sciezke zapisywac w polu
-	// subtitlesTmpPath
+    // powinna rozpakowywac pobrane napisy
 	virtual bool unpack() = 0;
 	// powinna czyscic pliki tymczasowe itd.
-	virtual void cleanup() = 0;
+    virtual void cleanup();
 
+    void pp();
 protected:
 
 	// sciezka do pliku filmowego
@@ -98,6 +85,8 @@ protected:
 	QString subtitles;
 	// sciezka do tymczasowego pliku z napisami
 	QString subtitlesTmp;
+    // sciezka do spakowanego pliku napisow
+    QString tmpPackedFile;
 	// sciezka do katalogu tymczasowego
 	QString tmpPath;
     // sciezka do pliku skryptu konwertujacego

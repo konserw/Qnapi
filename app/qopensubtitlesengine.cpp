@@ -13,7 +13,10 @@
 *****************************************************************************/
 
 #include "qopensubtitlesengine.h"
-#include "forms/frmopensubtitlesconfig.h"
+
+const QString QOpenSubtitlesEngine::openSubtitlesXmlRpcHost  = "www.opensubtitles.org";
+const QString QOpenSubtitlesEngine::openSubtitlesXmlRpcPath  = "/xml-rpc";
+const int QOpenSubtitlesEngine::openSubtitlesXmlRpcPort  = 80;
 
 // konstruktor klasy
 QOpenSubtitlesEngine::QOpenSubtitlesEngine(const QString & movieFile, const QString & subtitlesFile)
@@ -83,19 +86,6 @@ QIcon QOpenSubtitlesEngine::engineIcon()
 		".##.##.##.##.##.",
 		"................"};
     return QIcon(QPixmap(icon));
-}
-
-// zwraca czy silnik jest konfigurowalny
-bool QOpenSubtitlesEngine::isConfigurable()
-{
-	return true;
-}
-
-// wywoluje okienko konfiguracji
-void QOpenSubtitlesEngine::configure(QWidget * parent)
-{
-	frmOpenSubtitlesConfig config(parent);
-	config.exec();
 }
 
 // oblicza sume kontrolna dla pliku filmowego
@@ -272,14 +262,6 @@ bool QOpenSubtitlesEngine::unpack()
 	QFile::remove(unpackedTmp);
 
 	return true;
-}
-
-void QOpenSubtitlesEngine::cleanup()
-{
-	if(QFile::exists(tmpPackedFile))
-		QFile::remove(tmpPackedFile);
-	if(QFile::exists(subtitlesTmp))
-		QFile::remove(subtitlesTmp);
 }
 
 bool QOpenSubtitlesEngine::login()

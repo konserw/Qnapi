@@ -19,6 +19,22 @@
 #include <QTextStream>
 
 // ustawia sciezke do pliku filmowego
+QNapiAbstractEngine::~QNapiAbstractEngine()
+{
+    cleanup();
+}
+
+void QNapiAbstractEngine::cleanup()
+{
+    if(QFile::exists(tmpPackedFile))
+        QFile::remove(tmpPackedFile);
+    if(QFile::exists(subtitlesTmp))
+        QFile::remove(subtitlesTmp);
+    if(QFile::exists(scriptPath))
+        QFile::remove(scriptPath);
+
+}
+
 void QNapiAbstractEngine::setMoviePath(const QString & path)
 {
 	movie = path;
@@ -86,19 +102,6 @@ void QNapiAbstractEngine::pp()
 		ppRemoveLinesContainingWords(GlobalConfig().ppRemoveWords());
 	}
 
-	// Zmiana kodowania pobranych napisow
-	if(GlobalConfig().ppChangeEncoding())
-	{
-		// Jesli automatycznie nie uda mu sie wykryc kodowania, to jako kodowania
-		// zrodlowego uzywa kodowania wybranego przez uzytkownika
-		if (!GlobalConfig().ppAutoDetectEncoding()
-			|| !ppChangeSubtitlesEncoding(GlobalConfig().ppEncodingTo()))
-		{
-			ppChangeSubtitlesEncoding(GlobalConfig().ppEncodingFrom(),
-										GlobalConfig().ppEncodingTo());
-		}
-	}
-
 	// Zmiana uprawnien do pliku
 	if(GlobalConfig().ppChangePermissions())
 	{
@@ -159,93 +162,6 @@ bool QNapiAbstractEngine::convert()
     return true;
 }
 
-QString QNapiAbstractEngine::ppDetectEncoding(const QString & fileName, int testBufferSize)
-{
-	QString from;
-	QStringList codecs;
-
-	// Tylko takie kodowania obsługuja polskie litery
-	codecs << "windows-1250" << "windows-1257" << "ISO-8859-2"
-			<< "ISO-8859-13" << "ISO-8859-16" << "UTF-8";
-
-	QFile f(fileName);
-	if(!f.open(QIODevice::ReadOnly))
-		return "";
-
-	QByteArray testData = (testBufferSize > 0) ? f.read(testBufferSize) : f.readAll();
-
-	f.close();
-
-	foreach(QString codec, codecs)
-	{
-		QTextStream ts(testData);
-		ts.setCodec(qPrintable(codec));
-		QString encodedData = ts.readAll();
-		QStringList chars = QString::fromUtf8("ą/ś/ż/ć/ń/ł/ó/ę").split("/");
-
-		int i;
-		for (i = 0; i < chars.count(); i++)
-		{
-			if(!encodedData.contains(chars[i], Qt::CaseInsensitive))
-				break;
-		}
-
-		if(i == chars.count())
-		{
-			from = codec;
-			break;
-		}
-	}
-
-	return from;
-}
-
-// Konwertuje napisy z jednego kodowania na inne
-bool QNapiAbstractEngine::ppChangeSubtitlesEncoding(const QString & from, const QString & to)
-{
-	QFile f(subtitles);
-	if(!f.open(QIODevice::ReadOnly))
-		return false;
-
-	QByteArray fileContent = f.readAll();
-	
-	QString contentStr = QTextCodec::codecForName(qPrintable(from))->toUnicode(fileContent);
-	f.close();
-
-	if(to.compare("UTF-8", Qt::CaseInsensitive) != 0)
-	{
-		fileContent = QTextCodec::codecForName(qPrintable(to))
-						->fromUnicode(contentStr.constData(), contentStr.size());
-	}
-	else
-	{
-		fileContent.clear();
-		fileContent.append(contentStr);
-	}
-
-	if(!f.open(QIODevice::WriteOnly))
-		return false;
-
-	f.write(fileContent);
-	f.close();
-
-	return true;
-}
-
-// Konwertuje napisy z jednego kodowania na inne, dokonujac proby autodetekcji kodowania zrodlowego
-bool QNapiAbstractEngine::ppChangeSubtitlesEncoding(const QString & to)
-{
-	if(!QFileInfo(subtitles).exists())
-		return false;
-
-	QString from = ppDetectEncoding(subtitles);
-
-	if(from.isEmpty())
-		return false;
-
-	return ppChangeSubtitlesEncoding(from, to);
-}
-
 // Usuwanie linii zawierajacych podane slowa z pliku z napisami
 bool QNapiAbstractEngine::ppRemoveLinesContainingWords(QStringList wordList)
 {
@@ -253,11 +169,6 @@ bool QNapiAbstractEngine::ppRemoveLinesContainingWords(QStringList wordList)
 		return false;
 
 	wordList = wordList.filter(QRegExp("^(.+)$"));
-
-	QString fromCodec = ppDetectEncoding(subtitles);
-
-	if(fromCodec.isEmpty())
-		fromCodec = GlobalConfig().ppEncodingFrom();
 
 	QFile f(subtitles);
 	if(!f.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -272,8 +183,7 @@ bool QNapiAbstractEngine::ppRemoveLinesContainingWords(QStringList wordList)
 		while((i = line.indexOf('\r')) >= 0)
 			line.remove(i, 1);
 
-		QTextStream ts(line);
-		ts.setCodec(qPrintable(fromCodec));
+        QTextStream ts(line);
 		QString encLine = ts.readAll();
 
 		if(encLine.isEmpty())

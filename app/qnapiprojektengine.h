@@ -28,19 +28,6 @@
 
 #include "qnapilanguage.h"
 
-const unsigned long NAPI_10MB = 10485760;
-
-const QString napiZipPassword = "iBlm8NTigvru0Jr0";
-const QString napiDownloadUrlTpl= "http://www.napiprojekt.pl/unit_napisy/dl.php"
-				"?l=%1&f=%2&t=%3&v=other&kolejka=false&nick=%4&pass=%5&napios=%6";
-const QString napiCheckUserUrlTpl = "http://www.napiprojekt.pl/users_check.php?nick=%1&pswd=%2";
-const QString napiUploadUrlTpl = "http://www.napiprojekt.pl/unit_napisy/upload.php"
-				"?m_length=%1&m_resolution=%2x%3&m_fps=%4&m_hash=%5&m_filesize=%6";
-const QString napiUploadUrlSimpleTpl = "http://www.napiprojekt.pl/unit_napisy/upload.php"
-				"?m_hash=%5&m_filesize=%6";
-const QString napiReportBadUrlTpl = "http://www.napiprojekt.pl/unit_napisy/zlenapisyadd.php";
-const QString napiCreateUserUrlTpl = "http://www.napiprojekt.pl/users_add.php";
-
 class QNapiProjektEngine : public QNapiAbstractEngine
 {
 public:
@@ -66,18 +53,13 @@ public:
 	// zwraca informacje nt. modulu
 	QString engineInfo();
 	// zwraca ikone silnika pobierania
-	QIcon engineIcon();
-	// zwraca czy silnik jest konfigurowalny
-	bool isConfigurable();
-	// wywoluje okienko konfiguracji
-	void configure(QWidget * parent);
+    QIcon engineIcon();
 
 	QString checksum(QString filename = "");
 	bool lookForSubtitles(QString lang);
 	QList<QNapiSubtitleInfo> listSubtitles();
 	bool download(int idx);
-	bool unpack();
-	void cleanup();
+    bool unpack();
 
 	QString name()
 	{
@@ -95,13 +77,22 @@ public:
 
 private:
 
-	QString p7zipPath, nick, pass, tmpPackedFile;
+    QString p7zipPath, nick, pass;
 
 	QList<QNapiSubtitleInfo> subtitlesList;
 
 	QString checksum(QString filename, bool limit10M);
 	QString npFDigest(const QString & input);
 	QString npLangWrapper(QString lang);
+
+    static const unsigned long NAPI_10MB;
+    static const QString napiDownloadUrlTpl;
+    static const QString napiCheckUserUrlTpl;
+    static const QString napiUploadUrlTpl;
+    static const QString napiUploadUrlSimpleTpl;
+    static const QString napiReportBadUrlTpl;
+    static const QString napiCreateUserUrlTpl;
+    static const QString napiZipPassword;
 
 };
 

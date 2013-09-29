@@ -25,11 +25,6 @@
 #include "version.h"
 #include "qnapilanguage.h"
 
-
-const QString openSubtitlesXmlRpcHost  = "www.opensubtitles.org";
-const QString openSubtitlesXmlRpcPath  = "/xml-rpc";
-const int openSubtitlesXmlRpcPort  = 80;
-
 class QOpenSubtitlesEngine : public QNapiAbstractEngine
 {
 public:
@@ -43,10 +38,6 @@ public:
 	QString engineInfo();
 	// zwraca ikone silnika pobierania
 	QIcon engineIcon();
-	// zwraca czy silnik jest konfigurowalny
-	bool isConfigurable();
-	// wywoluje okienko konfiguracji
-	void configure(QWidget * parent);
 
 	// oblicza sume kontrolna pliku filmowego
 	QString checksum(QString filename = "");
@@ -58,12 +49,10 @@ public:
 	bool download(int idx);
 	// probuje rozpakowac napisy
 	bool unpack();
-	// czysci smieci, pliki tymczasowe
-	void cleanup();
 
 private:
 
-	QString p7zipPath, lang, tmpPackedFile, subFileName;
+    QString p7zipPath, lang, subFileName;
 	quint64 fileSize;
 
 	QSyncXmlRpcClient rpc;
@@ -78,6 +67,9 @@ private:
 	// wylogowuje z serwera
 	void logout();
 
+    static const QString openSubtitlesXmlRpcHost;
+    static const QString openSubtitlesXmlRpcPath;
+    static const int openSubtitlesXmlRpcPort;
 };
 
 #endif

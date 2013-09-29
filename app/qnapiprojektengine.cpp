@@ -13,11 +13,20 @@
 *****************************************************************************/
 
 #include "qnapiprojektengine.h"
-#include "forms/frmnapiprojektconfig.h"
+
+const unsigned long QNapiProjektEngine::NAPI_10MB = 10485760;
+const QString QNapiProjektEngine::napiDownloadUrlTpl= "http://www.napiprojekt.pl/unit_napisy/dl.php?l=%1&f=%2&t=%3&v=other&kolejka=false&nick=%4&pass=%5&napios=%6";
+const QString QNapiProjektEngine::napiCheckUserUrlTpl = "http://www.napiprojekt.pl/users_check.php?nick=%1&pswd=%2";
+const QString QNapiProjektEngine::napiUploadUrlTpl = "http://www.napiprojekt.pl/unit_napisy/upload.php?m_length=%1&m_resolution=%2x%3&m_fps=%4&m_hash=%5&m_filesize=%6";
+const QString QNapiProjektEngine::napiUploadUrlSimpleTpl = "http://www.napiprojekt.pl/unit_napisy/upload.php?m_hash=%5&m_filesize=%6";
+const QString QNapiProjektEngine::napiReportBadUrlTpl = "http://www.napiprojekt.pl/unit_napisy/zlenapisyadd.php";
+const QString QNapiProjektEngine::napiCreateUserUrlTpl = "http://www.napiprojekt.pl/users_add.php";
+const QString QNapiProjektEngine::napiZipPassword = "iBlm8NTigvru0Jr0";
+
 
 // konstruktor klasy
 QNapiProjektEngine::QNapiProjektEngine(const QString & movieFile, const QString & subtitlesFile)
-	: QNapiAbstractEngine(movieFile, subtitlesFile)
+    : QNapiAbstractEngine(movieFile, subtitlesFile)
 {
 	p7zipPath = GlobalConfig().p7zipPath();
 	nick = GlobalConfig().nick(engineName());
@@ -73,19 +82,6 @@ QIcon QNapiProjektEngine::engineIcon()
 		" .@@#@@#@#@@@@@.",
 		" ..............."};
     return QIcon(QPixmap(icon));
-}
-
-// zwraca czy silnik jest konfigurowalny
-bool QNapiProjektEngine::isConfigurable()
-{
-	return true;
-}
-
-// wywoluje okienko konfiguracji
-void QNapiProjektEngine::configure(QWidget * parent)
-{
-	frmNapiProjektConfig config(parent);
-	config.exec();
 }
 
 // oblicza sume kontrolna dla pliku filmowego (md5 z pierwszych 10MB pliku)
@@ -176,17 +172,6 @@ bool QNapiProjektEngine::unpack()
 
 	subtitlesTmp = tmpPath + "/" + checkSum + ".txt";
 	return QFile::exists(subtitlesTmp);
-}
-
-void QNapiProjektEngine::cleanup()
-{
-	if(QFile::exists(tmpPackedFile))
-		QFile::remove(tmpPackedFile);
-	if(QFile::exists(subtitlesTmp))
-		QFile::remove(subtitlesTmp);
-    if(QFile::exists(scriptPath))
-        QFile::remove(scriptPath);
-
 }
 
 // Tworzy konto uzytkownika na serwerze NAPI
