@@ -27,6 +27,7 @@
 #include "qhttp.h"
 #include <QEventLoop>
 #include <QBuffer>
+#include <QObject>
 
 /**
  * Provide a synchronous api over QHttp
@@ -35,7 +36,8 @@
 */
 class SyncHTTP: public QHttp
 {
-	Q_OBJECT
+Q_OBJECT
+
 	public:
 		/// structors
 		SyncHTTP( QObject * parent = 0 )
