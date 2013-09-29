@@ -16,16 +16,13 @@
 
 bool QNapiCli::isCliCall(int argc, char **argv)
 {
-#ifdef Q_WS_WIN
-	return false;
-#else
-	
 	#ifdef Q_WS_X11
 		if(getenv("DISPLAY") == 0)
 			return true;
 	#endif
 
 	QString p;
+    QStringList cliArgs = {"--console", "-c", "--quiet", "-q", "--help", "-h", "--help-languages", "-hl"};
 
 	for(int i = 1; i < argc; i++)
 	{
@@ -36,21 +33,13 @@ bool QNapiCli::isCliCall(int argc, char **argv)
 			return false;
 		}
 
-		if( (p == "--console") || (p == "-c") ||
-		   (p == "--quiet") || (p == "-q") )
-		{
-			return true;
-		}
-		
-		if( (p == "--help") || (p == "-h") ||
-			(p == "--help-languages") || (p == "-hl"))
+        if(cliArgs.contains(p))
 		{
 			return true;
 		}
 	}
 
 	return false;
-#endif
 }
 
 bool QNapiCli::analyze()
@@ -76,12 +65,7 @@ bool QNapiCli::analyze()
 		{
 			if(mode == CM_UNSET)
 			{
-#ifdef Q_WS_WIN
-				mode = CM_QUIET;
-				showPolicy = SLP_NEVER_SHOW;
-#else
 				mode = CM_CONSOLE;
-#endif
 			}
 		}
 		else if((p == "--quiet") || (p == "-q"))
@@ -113,6 +97,11 @@ bool QNapiCli::analyze()
 		{
 			showPolicy = SLP_NEVER_SHOW;
 		}
+        else if(QFileInfo(p).isDir())
+        {
+
+            movieList << QDir(p).entryList(QStringList() << "*.mp4" << "*.avi" << "*.mkv" << "*.mpg" << "*.mov" << "*.vob");
+        }
 		else if(QFileInfo(p).isFile())
 		{
 			movieList << p;
