@@ -16,6 +16,7 @@
 #define __QNAPILANGUAGE__H__
 
 #include <QObject>
+#include <QString>
 #include <QStringList>
 
 class QNapiLanguage : public QObject

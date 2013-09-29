@@ -30,7 +30,6 @@
 #include "qnapi.h"
 #include "qnapithread.h"
 #include "qnapiconfig.h"
-#include "qnapiopendialog.h"
 #include "frmlistsubtitles.h"
 
 class GetThread : public QNapiThread

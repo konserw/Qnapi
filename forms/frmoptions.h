@@ -25,8 +25,6 @@
 
 #include "ui_frmoptions.h"
 #include "qnapiconfig.h"
-
-#include "frmcreateuser.h"
 #include "qnapilanguage.h"
 
 
@@ -50,14 +48,8 @@ Q_OBJECT
 		void twEnginesSelectionChanged();
 		void twEnginesItemChanged(QTableWidgetItem * item);
 		void pbMoveUpClicked();
-		void pbMoveDownClicked();
-		void pbEngineConfClicked();
-		void pbEngineInfoClicked();	
-
-		void changeEncodingClicked();
-		void autoDetectEncodingClicked();
-		void showAllEncodingsClicked();
-		void useBrushedMetalClicked();
+        void pbMoveDownClicked();
+        void pbEngineInfoClicked();
 
 		void restoreDefaults();
 

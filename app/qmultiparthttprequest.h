@@ -41,7 +41,7 @@ class QMultipartHttpRequest
 				ET_CONTENT_TYPE,
 				ET_DATA,
 				ET_BOUNDARY,
-				ET_ENDING_BOUNDARY,
+                ET_ENDING_BOUNDARY
 			};
 
 			elementType type;

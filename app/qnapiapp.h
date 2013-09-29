@@ -25,18 +25,10 @@
 #include <QDesktopServices>
 
 #include "qcumber/qsingleapplication.h"
-
 #include "forms/frmprogress.h"
 #include "forms/frmoptions.h"
-#include "forms/frmupload.h"
-#include "forms/frmcorrect.h"
-#include "forms/frmreport.h"
-#include "forms/frmscan.h"
-#include "forms/frmcreateuser.h"
 #include "forms/frmsummary.h"
-
 #include "qnapiconfig.h"
-#include "qnapiopendialog.h"
 
 
 class QNapiApp : public QSingleApplication
@@ -46,26 +38,9 @@ class QNapiApp : public QSingleApplication
 		QNapiApp(int & argc, char **argv, bool useGui, const QString & appName);
 		~QNapiApp();
 
-		void createTrayIcon();
-		void showTrayMessage(QString title, QString msg);
-
 		frmProgress * progress();
 
-	public slots:
-
-		bool showOpenDialog(QString engine = "");
-		bool showScanDialog(QString init_dir = "");
-
-		void showNPGetDialog();
-		void showNPUploadDialog();
-		void showNPCorrectDialog();
-		void showNPReportDialog();
-		void showNPCreateUser();
-
-		void showOSGetDialog();
-		void showOSUploadDialog();
-		void showOSCreateUser();
-		
+	public slots:	
 		void showSettings();
 		void showAbout();
 		void tryQuit();
@@ -74,25 +49,10 @@ class QNapiApp : public QSingleApplication
 		void downloadFile(const QString & fileName);
 
 	private:
-
 		bool event(QEvent *ev);
-
-		QSystemTrayIcon *trayIcon;
-		QMenu *trayIconMenu, *napiSubMenu, *osSubMenu;
-		QAction *getAction, *scanAction, *napiGetAction, *napiAddAction,
-				*napiCorrectAction, *napiReportAction, *napiCreateUserAction,
-				*osGetAction, *osAddAction, *osCreateUserAction,
-				*settingsAction, *aboutAction, *quitAction;
-
-		QNapiOpenDialog *openDialog;
 		
 		frmProgress *f_progress;
-		frmOptions *f_options;
-		frmCreateUser *f_createUser;
-		frmScan *f_scan;
-		frmUpload *f_upload;
-		frmCorrect *f_correct;
-		frmReport *f_report;
+        frmOptions *f_options;
 };
 
 #endif

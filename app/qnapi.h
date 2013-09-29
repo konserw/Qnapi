@@ -35,8 +35,6 @@ class QNapi
 		static bool checkP7ZipPath();
 		// sprawdza katalog plikow tymczasowych
 		static bool checkTmpPath();
-		// sprawdza czy wlaczone jest przetwarzanie napisow
-		static bool ppEnabled();
 
 		// listuje dostępne silniki pobierania
 		static QStringList enumerateEngines();
@@ -69,8 +67,6 @@ class QNapi
 		bool unpack();
 		// dopasowuje pobrane napisy
 		bool match();
-		// wykonuje przetwarzanie na dopasowanych napisach
-		void pp();
         // konwersja na srt
         bool convert();
 
@@ -87,7 +83,9 @@ class QNapi
 		// listuje zaladowane moduly pobierania
 		QStringList listLoadedEngines();
 
-	private:
+        bool ppEnabled();
+        void pp();
+private:
 
 		// sciezka do pliku z filmem
 		QString movie;

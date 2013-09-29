@@ -2,7 +2,7 @@ TEMPLATE = app
 
 QT += network xml widgets
 
-CONFIG += qt release warn_on
+CONFIG += qt release warn_on c++11
 
 #python
 #INCLUDEPATH += /usr/include/python3.3m
@@ -31,7 +31,6 @@ app/qmultiparthttprequest.cpp \
 app/qnapiabstractengine.cpp \
 app/qnapiprojektengine.cpp \
 app/qnapicli.cpp \
-app/qnapiopendialog.cpp \
 app/qnapi.cpp \
 app/qopensubtitlesengine.cpp \
 app/qnapilanguage.cpp \
@@ -41,15 +40,8 @@ xmlrpc/variant.cpp \
 xmlrpc/response.cpp \
 forms/frmprogress.cpp \
 forms/frmoptions.cpp \
-forms/frmupload.cpp \
-forms/frmcorrect.cpp \
-forms/frmreport.cpp \
-forms/frmscan.cpp \
-forms/frmcreateuser.cpp \
 forms/frmsummary.cpp \
-forms/frmnapiprojektconfig.cpp \
 forms/frmlistsubtitles.cpp \
-forms/frmopensubtitlesconfig.cpp \
 qcumber/qinterprocesschannel.cpp \
 qcumber/qmanagedrequest.cpp \
 qcumber/qmanagedsocket.cpp \
@@ -66,7 +58,6 @@ app/synchttp.h \
 app/qnapiabstractengine.h \
 app/qnapiprojektengine.h \
 app/qnapicli.h \
-app/qnapiopendialog.h \
 app/qcheckedlistwidget.h \
 app/qnapi.h \
 app/qnapisubtitleinfo.h \
@@ -79,15 +70,8 @@ xmlrpc/request.h \
 xmlrpc/response.h \
 forms/frmprogress.h \
 forms/frmoptions.h \
-forms/frmupload.h \
-forms/frmcorrect.h \
-forms/frmreport.h \
-forms/frmscan.h \
-forms/frmcreateuser.h \
 forms/frmsummary.h \
-forms/frmnapiprojektconfig.h \
 forms/frmlistsubtitles.h \
-forms/frmopensubtitlesconfig.h \
 qcumber/qinterprocesschannel.h \
 qcumber/qmanagedrequest.h \
 qcumber/qmanagedsocket.h \
@@ -97,14 +81,7 @@ qcumber/qcumber.h
 FORMS += \
 forms/frmprogress.ui \
 forms/frmoptions.ui \
-forms/frmupload.ui \
-forms/frmcorrect.ui \
-forms/frmreport.ui \
-forms/frmscan.ui \
-forms/frmcreateuser.ui \
 forms/frmsummary.ui \
-forms/frmnapiprojektconfig.ui \
-forms/frmopensubtitlesconfig.ui \
 forms/frmlistsubtitles.ui
 
 RESOURCES += resources.qrc

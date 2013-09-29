@@ -21,9 +21,6 @@ frmProgress::frmProgress(QWidget * parent, Qt::WindowFlags f) : QWidget(parent, 
 
 	ui.setupUi(this);
 
-#ifdef Q_WS_MAC
-	setAttribute(Qt::WA_MacBrushedMetal, GlobalConfig().useBrushedMetal());
-#endif
 	setAttribute(Qt::WA_DeleteOnClose, false);
 	setAttribute(Qt::WA_QuitOnClose, false);
 
@@ -372,7 +369,7 @@ void GetThread::run()
 		emit progressChange(i, queue.size(), 0.75);
 		emit actionChange(tr("Dopasowywanie napisów..."));
 
-		if(!napi->match())
+        if(!napi->convert())
 		{
 			ABORT_POINT
 

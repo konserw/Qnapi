@@ -35,11 +35,14 @@ int main(int argc, char **argv)
 {
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
-	bool useGui = !QNapiCli::isCliCall(argc, argv);
-
 	regSignal();
 
-	if(useGui)
+    if(QNapiCli::isCliCall(argc, argv))
+    {
+        QNapiCli app(argc, argv);
+        return app.exec();
+    }
+    else
 	{
 		QNapiApp app(argc, argv, true, "QNapi");
 
@@ -72,9 +75,11 @@ int main(int argc, char **argv)
 					"teraz skonfigurować?"), QMessageBox::Yes | QMessageBox::No )
 				== QMessageBox::Yes )
 			{
-				app.showSettings();
+                app.showSettings();
 			}
 		}
+
+        app.showSettings();
 
 		// Jesli podano parametry, ustawiamy tzw. batch mode
 		if(pathList.size() > 0)
@@ -116,29 +121,15 @@ int main(int argc, char **argv)
 
 			if(QFileInfo(pathList.at(0)).isDir())
 			{
-				if(!app.showScanDialog(pathList.at(0)))
-					return 1;
+                pathList = QDir(pathList.at(0)).entryList();
 			}
-			else
-			{
-				app.progress()->enqueueFiles(pathList);
-				if(!app.progress()->download()) return 1;
-			}
-		}
 
-        // Jesli nie dzialamy w trybie pobierania, mozemy pokazac okno wyboru plikow z filmami
-		if(!app.progress()->isBatchMode())
-		{
-            app.progress()->setBatchMode(true);
-            if(!app.showOpenDialog())
+            app.progress()->enqueueFiles(pathList);
+            if(!app.progress()->download())
                 return 1;
+
 		}
 
-		return app.exec();
-	}
-	else
-	{
-		QNapiCli app(argc, argv);
 		return app.exec();
 	}
 }
