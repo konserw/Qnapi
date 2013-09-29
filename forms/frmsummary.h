@@ -15,20 +15,21 @@
 #ifndef __FRMSUMMARY__H__
 #define __FRMSUMMARY__H__
 
+#include <QDialog>
 #include <QDesktopWidget>
 #include <QListWidget>
 #include <QFileInfo>
 
 #include "qnapiconfig.h"
-
 #include "ui_frmsummary.h"
 
 class frmSummary: public QDialog
 {
 Q_OBJECT
+
 	public:
         frmSummary(QWidget *parent = 0, Qt::WindowFlags f = 0);
-		~frmSummary() {};
+        ~frmSummary(){}
 
 		void setSuccessList(const QStringList & list);
 		void setFailedList(const QStringList & list);

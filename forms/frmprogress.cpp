@@ -13,7 +13,6 @@
 *****************************************************************************/
 
 #include "frmprogress.h"
-#include "qnapiapp.h"
 
 frmProgress::frmProgress(QWidget * parent, Qt::WindowFlags f) : QWidget(parent, f)
 {

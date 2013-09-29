@@ -27,12 +27,6 @@ frmSummary::frmSummary(QWidget * parent, Qt::WindowFlags f) : QDialog(parent, f)
 
 void frmSummary::setSuccessList(const QStringList & list)
 {
-	if(list.isEmpty())
-	{
-		ui.tabWidget->removeTab(ui.tabWidget->indexOf(ui.tabSuccess));
-		return;
-	}
-
 	ui.lwSuccess->clear();
 	foreach(QString item, list)
 	{
@@ -40,20 +34,10 @@ void frmSummary::setSuccessList(const QStringList & list)
 												QFileInfo(item).fileName()));
 	}
 	ui.lwSuccess->sortItems();
-	ui.tabWidget->setTabText(ui.tabWidget->indexOf(ui.tabSuccess),
-								tr("Pobrano napisy dla %1 %2")
-								.arg(list.size())
-								.arg(tr(list.size() > 1 ? "plików" : "pliku")));
 }
 
 void frmSummary::setFailedList(const QStringList & list)
 {
-	if(list.isEmpty())
-	{
-		ui.tabWidget->removeTab(ui.tabWidget->indexOf(ui.tabFail));
-		return;
-	}
-
 	ui.lwFail->clear();
 	foreach(QString item, list)
 	{
@@ -61,9 +45,4 @@ void frmSummary::setFailedList(const QStringList & list)
 												QFileInfo(item).fileName()));
 	}
 	ui.lwFail->sortItems();
-
-	ui.tabWidget->setTabText(ui.tabWidget->indexOf(ui.tabFail),
-								tr("Nie pobrano napisów dla %1 %2")
-								.arg(list.size())
-								.arg(tr(list.size() > 1 ? "plików" : "pliku")));
 }

@@ -15,6 +15,7 @@
 #ifndef __FRMOPTIONS__H__
 #define __FRMOPTIONS__H__
 
+#include <QDialog>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QDir>
@@ -31,6 +32,7 @@
 class frmOptions: public QDialog
 {
 Q_OBJECT
+
 	public:
 		frmOptions(QWidget *parent = 0, Qt::WindowFlags f = 0);
 		~frmOptions();

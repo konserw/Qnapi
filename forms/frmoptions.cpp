@@ -13,13 +13,10 @@
 *****************************************************************************/
 
 #include "frmoptions.h"
-#include "qnapiapp.h"
 
 frmOptions::frmOptions(QWidget * parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
 	ui.setupUi(this);
-
-	ui.cbUseBrushedMetal->hide();
 
 	QString tlcode;
 	foreach(QString lang, QNapiLanguage("").listLanguages())
@@ -29,8 +26,6 @@ frmOptions::frmOptions(QWidget * parent, Qt::WindowFlags f) : QDialog(parent, f)
 							lang,
 							QVariant(tlcode));
 	}
-
-	setAttribute(Qt::WA_QuitOnClose, false);
 
 	connect(ui.le7zPath, SIGNAL(textChanged(const QString &)), this, SLOT(le7zPathChanged()));
 	connect(ui.pb7zPathSelect, SIGNAL(clicked()), this, SLOT(select7zPath()));
@@ -42,13 +37,7 @@ frmOptions::frmOptions(QWidget * parent, Qt::WindowFlags f) : QDialog(parent, f)
 
 	connect(ui.pbMoveUp, SIGNAL(clicked()), this, SLOT(pbMoveUpClicked()));
 	connect(ui.pbMoveDown, SIGNAL(clicked()), this, SLOT(pbMoveDownClicked()));
-	connect(ui.pbEngineConf, SIGNAL(clicked()), this, SLOT(pbEngineConfClicked()));
 	connect(ui.pbEngineInfo, SIGNAL(clicked()), this, SLOT(pbEngineInfoClicked()));
-
-	connect(ui.cbChangeEncoding, SIGNAL(clicked()), this, SLOT(changeEncodingClicked()));
-	connect(ui.cbAutoDetectEncoding, SIGNAL(clicked()), this, SLOT(autoDetectEncodingClicked()));
-	connect(ui.cbShowAllEncodings, SIGNAL(clicked()), this, SLOT(showAllEncodingsClicked()));
-	connect(ui.cbUseBrushedMetal, SIGNAL(clicked()), this, SLOT(useBrushedMetalClicked()));
 
 	connect(ui.pbRestoreDefaults, SIGNAL(clicked()), this, SLOT(restoreDefaults()));
 
@@ -197,7 +186,6 @@ void frmOptions::writeConfig()
 	GlobalConfig().setP7zipPath(ui.le7zPath->text());
 	GlobalConfig().setTmpPath(ui.leTmpPath->text());
 	GlobalConfig().setLanguage(ui.cbLang->itemData(ui.cbLang->currentIndex()).toString());
-    GlobalConfig().setNoBackup(ui.cbNoBackup->isChecked());
 
 	QList<QPair<QString, bool> > engines;
 	for(int i = 0; i < ui.twEngines->rowCount(); ++i)
@@ -211,7 +199,6 @@ void frmOptions::writeConfig()
 	GlobalConfig().setSearchPolicy((SearchPolicy)ui.cbSearchPolicy->currentIndex());
 	GlobalConfig().setDownloadPolicy((DownloadPolicy)ui.cbDownloadPolicy->currentIndex());
 
-    GlobalConfig().setPpEnabled(ui.gbPpEnable->isChecked());
 	GlobalConfig().setPpRemoveLines(ui.cbRemoveLines->isChecked());
 	GlobalConfig().setPpRemoveWords(ui.teRemoveWords->toPlainText().split("\n"));
 	GlobalConfig().setPpChangePermissions(ui.cbChangePermissions->isChecked());
@@ -231,9 +218,6 @@ void frmOptions::readConfig()
 	ui.le7zPath->setText(GlobalConfig().p7zipPath());
 	ui.leTmpPath->setText(GlobalConfig().tmpPath());
 	ui.cbLang->setCurrentIndex(ui.cbLang->findData(QNapiLanguage(GlobalConfig().language()).toTwoLetter()));
-
-	ui.cbNoBackup->setChecked(GlobalConfig().noBackup());
-	ui.cbUseBrushedMetal->setChecked(GlobalConfig().useBrushedMetal());
 
 	QNapi n;
 	n.addEngines(n.enumerateEngines());
@@ -282,16 +266,13 @@ void frmOptions::restoreDefaults()
 {
 	GlobalConfig().setP7zipPath("");
 	GlobalConfig().setTmpPath(QDir::tempPath());
-	GlobalConfig().setLanguage("pl");
-    GlobalConfig().setNoBackup(false);
+    GlobalConfig().setLanguage("pl");
 	QList<QPair<QString, bool> > engines;
 	engines << QPair<QString, bool>("NapiProjekt", true)
 			<< QPair<QString, bool>("OpenSubtitles", true);
 	GlobalConfig().setEngines(engines);
-	GlobalConfig().setSearchPolicy(SP_SEARCH_ALL);
-	GlobalConfig().setDownloadPolicy(DP_SHOW_LIST_IF_NEEDED);
+    GlobalConfig().setSearchPolicy(SP_SEARCH_ALL);
 
-    GlobalConfig().setPpEnabled(false);
 	GlobalConfig().setPpRemoveLines(false);
 	QStringList words;
 	words << "movie info" << "synchro";
