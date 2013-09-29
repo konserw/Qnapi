@@ -25,7 +25,6 @@ INCLUDEPATH += app
 SOURCES += \
 app/main.cpp \
 app/qnapiconfig.cpp \
-app/qnapiapp.cpp \
 app/movieinfo.cpp \
 app/qmultiparthttprequest.cpp \
 app/qnapiabstractengine.cpp \
@@ -50,7 +49,6 @@ qcumber/qsingleapplication.cpp
 HEADERS += \
 app/version.h \
 app/qnapiconfig.h \
-app/qnapiapp.h \
 app/movieinfo.h \
 app/qmultiparthttprequest.h \
 app/qnapithread.h \
