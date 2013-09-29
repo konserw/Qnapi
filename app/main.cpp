@@ -14,22 +14,22 @@
 
 #include <QApplication>
 #include <QMessageBox>
-#include <QSystemTrayIcon>
 #include <QStringList>
 #include <QTextCodec>
 #include <QTranslator>
-#include <QLibraryInfo>
-#include <QLocale>
-#include "version.h"
-#include "qnapiconfig.h"
-#include "qnapiapp.h"
-#include "qnapicli.h"
-
+//#include <QLibraryInfo>
+//#include <QLocale>
 #include <signal.h>
 
-QStringList parseArgs(int argc, char **argv);
+#include "version.h"
+#include "qnapiconfig.h"
+#include "qnapicli.h"
+#include "forms/frmprogress.h"
+#include "forms/frmoptions.h"
+
 void regSignal();
 void sigHandler(int);
+void showSettings();
 
 int main(int argc, char **argv)
 {
@@ -44,118 +44,91 @@ int main(int argc, char **argv)
     }
     else
 	{
-		QNapiApp app(argc, argv, true, "QNapi");
-
-		QStringList pathList = parseArgs(argc, argv);
+        QApplication app(argc, argv);
 
 		QString resourceDir = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
 		QTranslator cuteTranslator;
 		cuteTranslator.load("qt_" + QLocale::system().name(), resourceDir);
 		app.installTranslator(&cuteTranslator);
-		app.setQuitOnLastWindowClosed(false);
 
-		if(app.arguments().contains("-o") || app.arguments().contains("--options"))
+
+        frmProgress progress;
+        progress.show();
+
+        QStringList args = app.arguments();
+        QStringList pathList;
+        QString batchLang, p;
+        bool invalidLang = false;
+
+        for(int i=0; i < args.size(); ++i)
+        {
+            if(p.startsWith("file://"))
+                p = p.remove(0, 7);
+
+            if(QFileInfo(p).isDir())
+            {
+                pathList << QDir(p).entryList(QStringList() << "*.mp4" << "*.avi" << "*.mkv" << "*.mpg" << "*.mov" << "*.vob");
+            }
+
+            if(QFileInfo(p).isFile())
+                pathList << p;
+
+            if((p == "-l") || (p == "--language"))
+            {
+                ++i;
+                if(i < args.size())
+                {
+                    batchLang = QNapiLanguage(args[i]).toTwoLetter();
+                    if(batchLang.isEmpty())
+                        invalidLang = true;
+                }
+                else
+                    invalidLang = true;
+            }
+
+        }
+
+
+        if(args.contains("-o") || args.contains("--options") || pathList.size() == 0)
 		{
-			app.setQuitOnLastWindowClosed(true);
-			app.showSettings();
+            showSettings();
 			return 0;
 		}
-
-		if(!app.isInstanceAllowed())
+        else // Jesli podano parametry, ustawiamy tzw. batch mode
 		{
-			for(int i = 0; i < pathList.size(); i++)
-				app.sendRequest(pathList[i]);
-			return 0;
-		}
-		
-		if(GlobalConfig().firstRun())
-		{
-			if(QMessageBox::question(0, QObject::tr("Pierwsze uruchomienie"),
-					QObject::tr("To jest pierwsze uruchomienie programu QNapi. Czy chcesz go "
-					"teraz skonfigurować?"), QMessageBox::Yes | QMessageBox::No )
-				== QMessageBox::Yes )
-			{
-                app.showSettings();
-			}
-		}
+            if(GlobalConfig().firstRun())
+            {
+                if(QMessageBox::question(0, QObject::tr("Pierwsze uruchomienie"),
+                        QObject::tr("To jest pierwsze uruchomienie programu QNapi. Czy chcesz go "
+                        "teraz skonfigurować?"), QMessageBox::Yes | QMessageBox::No )
+                    == QMessageBox::Yes )
+                {
+                    showSettings();
+                }
+            }
 
-        app.showSettings();
-
-		// Jesli podano parametry, ustawiamy tzw. batch mode
-		if(pathList.size() > 0)
-		{
-			app.progress()->setBatchMode(true);
-
-			QString batchLang, p;
-			bool invalidLang = false;
-
-			for(int i = 1; i < argc; i++)
-			{
-				p = argv[i];
-
-				if((p == "-l") || (p == "--language"))
-				{
-					++i;
-					if(i < argc)
-					{
-						batchLang = QNapiLanguage(argv[i]).toTwoLetter();
-						if(batchLang.isEmpty())
-							invalidLang = true;
-					} else invalidLang = true;
-					break;
-				}
-			}
+            progress.setBatchMode(true);
 
 			if(invalidLang)
 			{
-				if(QMessageBox::question(0, "QNapi", "Niepoprawny kod językowy!\n"
-						"Czy chcesz pobrać napisy w domyślnym języku?",
-						QMessageBox::Yes | QMessageBox::No)
+                if(QMessageBox::question(0, "QNapi", QObject::tr("Niepoprawny kod językowy!\n"
+                        "Czy chcesz pobrać napisy w domyślnym języku?"), QMessageBox::Yes | QMessageBox::No)
 					!= QMessageBox::Yes)
 				{
 					return 0;
 				}
 			}
 
-			app.progress()->setBatchLanguage(batchLang);
+            progress.setBatchLanguage(batchLang);
 
-			if(QFileInfo(pathList.at(0)).isDir())
-			{
-                pathList = QDir(pathList.at(0)).entryList();
-			}
-
-            app.progress()->enqueueFiles(pathList);
-            if(!app.progress()->download())
+            progress.enqueueFiles(pathList);
+            if(!progress.download())
                 return 1;
 
 		}
 
-		return app.exec();
+        return app.exec();
 	}
-}
-
-QStringList parseArgs(int argc, char **argv)
-{
-	QStringList pathList;
-
-	for(int i = 1; i < argc; i++)
-	{
-		QString p = argv[i];
-
-		if(p.startsWith("file://"))
-			p = p.remove(0, 7);
-
-		if((pathList.size() == 0) && QFileInfo(p).isDir())
-		{
-			pathList << p;
-			break;
-		}
-
-		if(QFileInfo(p).isFile())
-			pathList << p;
-	}
-
-	return pathList;
 }
 
 void regSignal()
@@ -179,6 +152,7 @@ void sigHandler(int sig)
 	QStringList filters;
 	filters << "QNapi-*-rc";
 	filters << "QNapi.*.tmp";
+    filters << "convert.py";
 
 	QDir dir(tmpPath);
 
@@ -190,4 +164,13 @@ void sigHandler(int sig)
 	}
 
 	exit(666);
+}
+
+void showSettings()
+{
+    frmOptions f_options;
+    f_options.readConfig();
+
+    if(f_options.exec() == QDialog::Accepted)
+        f_options.writeConfig();
 }
