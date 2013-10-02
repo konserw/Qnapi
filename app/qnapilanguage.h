@@ -24,10 +24,10 @@ class QNapiLanguage : public QObject
 Q_OBJECT
 
 public:
-
 	QNapiLanguage(QString source = "");
 
 	void setLanguage(QString source);
+    bool isValid() const;
 
 	QString toTwoLetter();
 	QString toTriLetter();
@@ -36,7 +36,6 @@ public:
 	QStringList listLanguages();
 
 private:
-
 	QStringList codes2l, codes3l, names;
 	int idx;
 

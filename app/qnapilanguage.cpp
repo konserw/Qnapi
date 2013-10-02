@@ -36,10 +36,15 @@ void QNapiLanguage::setLanguage(QString source)
 	else
 	{
 		idx = names.indexOf(source);
-	}	
+    }
 }
 
-QString QNapiLanguage::toTwoLetter()
+bool QNapiLanguage::isValid() const
+{
+    return idx > -1;
+}
+
+QString QNapiLanguage::toTwoLetter() const
 {
 	if(idx > -1)
 	{
@@ -48,7 +53,7 @@ QString QNapiLanguage::toTwoLetter()
 	return "";
 }
 
-QString QNapiLanguage::toTriLetter()
+QString QNapiLanguage::toTriLetter() const
 {
 	if(idx > -1)
 	{
@@ -57,7 +62,7 @@ QString QNapiLanguage::toTriLetter()
 	return "";
 }
 
-QString QNapiLanguage::toFullName()
+QString QNapiLanguage::toFullName() const
 {
 	if(idx > -1)
 	{
@@ -66,7 +71,7 @@ QString QNapiLanguage::toFullName()
 	return "";
 }
 	
-QStringList QNapiLanguage::listLanguages()
+QStringList QNapiLanguage::listLanguages() const
 {
 	return names;
 }
