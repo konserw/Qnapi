@@ -29,11 +29,11 @@ public:
 	void setLanguage(QString source);
     bool isValid() const;
 
-	QString toTwoLetter();
-	QString toTriLetter();
-	QString toFullName();
+    QString toTwoLetter() const;
+    QString toTriLetter() const;
+    QString toFullName() const;
 
-	QStringList listLanguages();
+    QStringList listLanguages() const;
 
 private:
 	QStringList codes2l, codes3l, names;
