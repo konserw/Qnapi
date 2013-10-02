@@ -1,12 +1,14 @@
 TEMPLATE = app
 
-QT += network xml widgets
+DEFINES += VERSION=1.69
 
-CONFIG += qt release warn_on c++11
+QT += network xml widgets core
+
+CONFIG += qt release c++11 #warn_on
 
 #python
-#INCLUDEPATH += /usr/include/python3.3m
-#LIBS += -lpthread -ldl -lutil -lm -lpython3.3m
+INCLUDEPATH += /usr/include/python2.7
+LIBS += -lpthread -ldl -lutil -lm -lpython2.7
 #QMAKE_CXXFLAGS += -fms-extensions -std=c++03
 
 #qt http
@@ -17,7 +19,8 @@ HEADERS += \
     qhttp/qhttpauthenticator_p.h
 SOURCES += \
     qhttp/qhttp.cpp \
-    qhttp/qhttpauthenticator.cpp
+    qhttp/qhttpauthenticator.cpp \
+    app/qnapisubtitleinfo.cpp
 
 #qnapi
 INCLUDEPATH += app
@@ -47,7 +50,6 @@ qcumber/qmanagedsocket.cpp \
 qcumber/qsingleapplication.cpp
 
 HEADERS += \
-app/version.h \
 app/qnapiconfig.h \
 app/movieinfo.h \
 app/qmultiparthttprequest.h \
