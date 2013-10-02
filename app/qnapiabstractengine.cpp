@@ -15,6 +15,7 @@
 #include "qnapiabstractengine.h"
 #include "qnapiconfig.h"
 #include "qnapisubtitleinfo.h"
+#include "QNapiSubtitleInfoList.h"
 
 #include <QTextCodec>
 #include <QTextStream>
@@ -58,27 +59,7 @@ bool QNapiAbstractEngine::process()
         return false;
     }
 
-    // Usuwanie linii z plikow z napisami
-    if(GlobalConfig().ppRemoveLines())
-    {
-        removeLinesContainingWords(GlobalConfig().ppRemoveWords(), info);
-    }
 
-    // Zmiana uprawnien do pliku
-    if(GlobalConfig().ppChangePermissions())
-    {
-        bool validPermissions;
-        int permInt = GlobalConfig().ppPermissions().toInt(&validPermissions, 8);
-
-        if(validPermissions)
-        {
-            int perm = 0;
-            perm |= (permInt & 0700) << 2;
-            perm |= (permInt & 0070) << 1;
-            perm |= (permInt & 0007);
-            changeSubtitlesPermissions(QFile::Permissions(perm));
-        }
-    }
 
     return true;
 }
@@ -92,11 +73,11 @@ QNapiAbstractEngine::~QNapiAbstractEngine()
 
 bool QNapiAbstractEngine::convert(QNapiSubtitleInfo &info)
 {
-    if(!info.hasSubtitlesTmp())
+    if(!info.subtitlesTmpExist())
         return false;
 
     QString framerate;
-    double fps = info.movieFPS();
+    double fps = info.parent()->movieFPS();
     if(fps < 24) framerate = "FPS_23_976";
     else if(fps < 24.5) framerate = "FPS_24_000";
     else if(fps < 27) framerate = "FPS_25_000";
@@ -120,6 +101,31 @@ bool QNapiAbstractEngine::convert(QNapiSubtitleInfo &info)
         return false;
 
     return (process.exitCode() == 0);
+}
+
+void QNapiAbstractEngine::pp(const QNapiSubtitleInfo& info)
+{
+    // Usuwanie linii z plikow z napisami
+    if(GlobalConfig().ppRemoveLines())
+    {
+        removeLinesContainingWords(GlobalConfig().ppRemoveWords(), info);
+    }
+
+    // Zmiana uprawnien do pliku
+    if(GlobalConfig().ppChangePermissions())
+    {
+        bool validPermissions;
+        int permInt = GlobalConfig().ppPermissions().toInt(&validPermissions, 8);
+
+        if(validPermissions)
+        {
+            int perm = 0;
+            perm |= (permInt & 0700) << 2;
+            perm |= (permInt & 0070) << 1;
+            perm |= (permInt & 0007);
+            changeSubtitlesPermissions(QFile::Permissions(perm), info);
+        }
+    }
 }
 
 // Usuwanie linii zawierajacych podane slowa z pliku z napisami

@@ -14,6 +14,14 @@
 
 #include "qnapiprojektengine.h"
 #include "qnapisubtitleinfo.h"
+#include "QNapiSubtitleInfoList.h"
+#include "movieinfo.h"
+#include "qnapilanguage.h"
+
+#include <QUrl>
+#include <QMessageBox>
+#include <QCryptographicHash>
+#include <cmath>
 #include <QFile>
 #include <QIcon>
 #include <QPixmap>
@@ -24,15 +32,14 @@ const QString QNapiProjektEngine::m_napiZipPassword = "iBlm8NTigvru0Jr0";
 
 // konstruktor klasy
 QNapiProjektEngine::QNapiProjektEngine(const QString & movieFile, const QString &lang)
-    : QNapiAbstractEngine()
+    : QNapiAbstractEngine(movieFile, lang)
 {
-    m_info = new QNapiSubtitleInfo(movieFile, lang);
+
 }
 
 // destruktor klasy
 QNapiProjektEngine::~QNapiProjektEngine()
 {
-    delete m_info;
 }
 
 
@@ -81,7 +88,7 @@ QIcon QNapiProjektEngine::engineIcon()
 // oblicza sume kontrolna dla pliku filmowego (md5 z pierwszych 10MB pliku)
 bool QNapiProjektEngine::checksum()
 {
-    QFile file(m_info->moviePath());
+    QFile file(m_infoList->moviePath());
     QByteArray fileArray;
 
     if(!file.open(QIODevice::ReadOnly))
@@ -101,7 +108,7 @@ bool QNapiProjektEngine::checksum()
         snprintf(next, 3, "%.2x", (unsigned char)b[i]);
         checkSum += next;
     }
-    m_info->setCheckSum(checkSum);
+    m_infoList->setCheckSum(checkSum);
 
     return true;
 }
@@ -109,13 +116,13 @@ bool QNapiProjektEngine::checksum()
 
 bool QNapiProjektEngine::lookForSubtitles()
 {
-    if(!m_info->hasChecksum()) return false;
+    if(!m_infoList->hasChecksum()) return false;
 
-	SyncHTTP http;
+
     QString urlTxt = m_napiDownloadUrlTpl
-            .arg(npLangWrapper(m_info->lang()))
-            .arg(m_info->checkSum())
-            .arg(npFDigest(m_info->checkSum()))
+            .arg(npLangWrapper(m_infoList->lang()))
+            .arg(m_infoList->checkSum())
+            .arg(npFDigest(m_infoList->checkSum()))
             .arg("NapiProjekt")
             .arg("NapiProjekt")
             .arg("Linux/UNIX");
@@ -125,28 +132,13 @@ bool QNapiProjektEngine::lookForSubtitles()
 	http.setHost(url.host());
     http.syncGet(url.path() + "?" + url.query(QUrl::EncodeDelimiters | QUrl::EncodeReserved | QUrl::EncodeSpaces | QUrl::EncodeUnicode));
 
-	QByteArray buffer = http.readAll();
+    if(!http.bytesAvailable())
+        return false;
 
-	if(buffer.indexOf("NPc") == 0)
-		return false;
+    QNapiSubtitleInfo* i = new QNapiSubtitleInfo(m_infoList);
+    i->setUrl(urlTxt);
 
-	QFile file(tmpPackedFile);
-	if(file.exists()) file.remove();
-	if(!file.open(QIODevice::WriteOnly))
-		return false;
 
-	int r = file.write(buffer);
-	file.close();
-	
-	if(!r) return false;
-	
-    subInfo = new QNapiSubtitleInfo(m_lang,
-                                engineName(),
-                                urlTxt,
-                                QFileInfo(movie).completeBaseName(),
-                                "",
-                                "txt",
-                                SUBTITLE_UNKNOWN);
 
     return true;
 }
@@ -154,14 +146,27 @@ bool QNapiProjektEngine::lookForSubtitles()
 // Probuje pobrac napisy do filmu z serwera NAPI
 bool QNapiProjektEngine::download()
 {
-    return (subInfo != 0);
+    QByteArray buffer = http.readAll();
+
+    if(buffer.indexOf("NPc") == 0)
+        return false;
+
+    QFile file(tmpPackedFile);
+    if(file.exists()) file.remove();
+    if(!file.open(QIODevice::WriteOnly))
+        return false;
+
+    int r = file.write(buffer);
+    file.close();
+
+    return (bool)!r;
 }
 
 // Probuje rozpakowac napisy do filmu
 bool QNapiProjektEngine::unpack()
 {
     if(!QFile::exists(tmpPackedFile)) return false;
-	subtitlesTmp = tmpPath + "/" + checkSum + ".txt";
+    subtitlesTmp = ;
 
 	if(QFile::exists(subtitlesTmp))
 		QFile::remove(subtitlesTmp);

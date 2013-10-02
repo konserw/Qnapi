@@ -1,11 +1,12 @@
 #include "qnapisubtitleinfo.h"
-#include "qnapiconfig.h"
-#include "movieinfo.h"
+#include "QNapiSubtitleInfoList.h"
+
+#include <QFile>
 
 bool QNapiSubtitleInfo::m_initialized = false;
 
-QNapiSubtitleInfo::QNapiSubtitleInfo(const QString &moviePath, const QString &lang)
-    : m_moviePath(moviePath)
+QNapiSubtitleInfo::QNapiSubtitleInfo(QNapiSubtitleInfoList *parent)
+    : m_parent(parent)
 {
     if(!m_initialized)
     {
@@ -13,41 +14,7 @@ QNapiSubtitleInfo::QNapiSubtitleInfo(const QString &moviePath, const QString &la
         m_initialized = true;
     }
 
-    m_tmpPath = GlobalConfig().tmpPath();
-    m_tmpPackedFile =  QString("%1/QNapi.%2.tmp").arg(m_tmpPath).arg(qrand());
-
-    if(lang.isEmpty())
-        m_lang = GlobalConfig().language();
-    else
-        m_lang = lang;
-}
-
-double QNapiSubtitleInfo::movieFPS() const
-{
-    MovieInfo info(m_moviePath);
-    if(info.isErr)
-        return 0;
-    return info.fps;
-}
-
-bool QNapiSubtitleInfo::hasChecksum() const
-{
-    return !m_checkSum.isEmpty();
-}
-
-QString QNapiSubtitleInfo::movieName() const
-{
-    return QString();//placeholder
-}
-
-QString QNapiSubtitleInfo::moviePath() const
-{
-    return m_moviePath;
-}
-
-void QNapiSubtitleInfo::setMoviePath(const QString &moviePath)
-{
-    m_moviePath = moviePath;
+    m_tmpPackedFile =  QString("%1/QNapi.%2.tmp").arg(m_parent->tmpPath()).arg(qrand());
 }
 
 bool QNapiSubtitleInfo::subtitlesExist() const
@@ -89,15 +56,7 @@ void QNapiSubtitleInfo::setTmpPackedFile(const QString &tmpPackedFile)
 {
     m_tmpPackedFile = tmpPackedFile;
 }
-QString QNapiSubtitleInfo::tmpPath() const
-{
-    return m_tmpPath;
-}
 
-void QNapiSubtitleInfo::setTmpPath(const QString &tmpPath)
-{
-    m_tmpPath = tmpPath;
-}
 QString QNapiSubtitleInfo::scriptPath() const
 {
     return m_scriptPath;
@@ -107,21 +66,19 @@ void QNapiSubtitleInfo::setScriptPath(const QString &scriptPath)
 {
     m_scriptPath = scriptPath;
 }
-QString QNapiSubtitleInfo::checkSum() const
+QNapiSubtitleInfoList *QNapiSubtitleInfo::parent() const
 {
-    return m_checkSum;
+    return m_parent;
 }
 
-void QNapiSubtitleInfo::setCheckSum(const QString &checkSum)
+QString QNapiSubtitleInfo::url() const
 {
-    m_checkSum = checkSum;
-}
-QString QNapiSubtitleInfo::lang() const
-{
-    return m_lang;
+    return m_url;
 }
 
-void QNapiSubtitleInfo::setLang(const QString &lang)
+void QNapiSubtitleInfo::setUrl(const QString &url)
 {
-    m_lang = lang;
+    m_url = url;
 }
+
+

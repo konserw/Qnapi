@@ -15,18 +15,12 @@
 #ifndef __QNAPIPROJEKTENGINE__H__
 #define __QNAPIPROJEKTENGINE__H__
 
-#include <QCryptographicHash>
-#include <QUrl>
-#include <QMessageBox>
 
-#include <cmath>
+
 
 #include "qnapiabstractengine.h"
 #include "qmultiparthttprequest.h"
 #include "synchttp.h"
-#include "movieinfo.h"
-
-#include "qnapilanguage.h"
 
 class QNapiProjektEngine : public QNapiAbstractEngine
 {
@@ -50,7 +44,7 @@ public:
     void cleanup();
 
 private:
-    QNapiSubtitleInfo* m_info;
+    SyncHTTP http;
 
 	QString npFDigest(const QString & input);
     QString npLangWrapper(QString m_lang);

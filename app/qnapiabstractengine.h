@@ -53,6 +53,8 @@ public:
     // konwersja na srt
     virtual bool convert() = 0;
     bool convert(QNapiSubtitleInfo& info);
+    //post proces
+    virtual void pp(const QNapiSubtitleInfo &info);
     // usuwa linie z pliku zawierajace conajmniej jedno z podanej listy slow
     bool removeLinesContainingWords(QStringList wordList, const QNapiSubtitleInfo &info);
     // zmienia uprawnienia do pliku z napisami   

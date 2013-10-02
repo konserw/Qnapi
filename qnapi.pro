@@ -16,11 +16,13 @@ INCLUDEPATH += qhttp
 HEADERS += \
     qhttp/qhttp.h \
     qhttp/qringbuffer_p.h \
-    qhttp/qhttpauthenticator_p.h
+    qhttp/qhttpauthenticator_p.h \
+    app/QNapiSubtitleInfoList.h
 SOURCES += \
     qhttp/qhttp.cpp \
     qhttp/qhttpauthenticator.cpp \
-    app/qnapisubtitleinfo.cpp
+    app/qnapisubtitleinfo.cpp \
+    app/QNapiSubtitleInfoList.cpp
 
 #qnapi
 INCLUDEPATH += app
