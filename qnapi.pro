@@ -4,7 +4,7 @@ DEFINES += VERSION=1.69
 
 QT += network xml widgets core
 
-CONFIG += qt release c++11 #warn_on
+CONFIG += qt release c++11 warn_on
 
 #python
 INCLUDEPATH += /usr/include/python2.7
@@ -34,7 +34,7 @@ app/movieinfo.cpp \
 app/qmultiparthttprequest.cpp \
 app/qnapiabstractengine.cpp \
 app/qnapiprojektengine.cpp \
-app/qnapicli.cpp \
+#app/qnapicli.cpp \
 app/qnapi.cpp \
 app/qopensubtitlesengine.cpp \
 app/qnapilanguage.cpp \
@@ -43,11 +43,7 @@ xmlrpc/request.cpp \
 xmlrpc/variant.cpp \
 xmlrpc/response.cpp \
 forms/frmoptions.cpp \
-forms/frmsummary.cpp \
-qcumber/qinterprocesschannel.cpp \
-qcumber/qmanagedrequest.cpp \
-qcumber/qmanagedsocket.cpp \
-qcumber/qsingleapplication.cpp
+forms/frmsummary.cpp
 
 HEADERS += \
 app/qnapiconfig.h \
@@ -57,7 +53,7 @@ app/qnapithread.h \
 app/synchttp.h \
 app/qnapiabstractengine.h \
 app/qnapiprojektengine.h \
-app/qnapicli.h \
+#app/qnapicli.h \
 app/qcheckedlistwidget.h \
 app/qnapi.h \
 app/qnapisubtitleinfo.h \
@@ -69,12 +65,7 @@ xmlrpc/client.h \
 xmlrpc/request.h \
 xmlrpc/response.h \
 forms/frmoptions.h \
-forms/frmsummary.h \
-qcumber/qinterprocesschannel.h \
-qcumber/qmanagedrequest.h \
-qcumber/qmanagedsocket.h \
-qcumber/qsingleapplication.h \
-qcumber/qcumber.h 
+forms/frmsummary.h
 
 FORMS += \
 forms/frmoptions.ui \
