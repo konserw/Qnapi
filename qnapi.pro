@@ -42,7 +42,6 @@ xmlrpc/client.cpp \
 xmlrpc/request.cpp \
 xmlrpc/variant.cpp \
 xmlrpc/response.cpp \
-forms/frmprogress.cpp \
 forms/frmoptions.cpp \
 forms/frmsummary.cpp \
 qcumber/qinterprocesschannel.cpp \
@@ -69,7 +68,6 @@ xmlrpc/variant.h \
 xmlrpc/client.h \
 xmlrpc/request.h \
 xmlrpc/response.h \
-forms/frmprogress.h \
 forms/frmoptions.h \
 forms/frmsummary.h \
 qcumber/qinterprocesschannel.h \
@@ -79,7 +77,6 @@ qcumber/qsingleapplication.h \
 qcumber/qcumber.h 
 
 FORMS += \
-forms/frmprogress.ui \
 forms/frmoptions.ui \
 forms/frmsummary.ui
 

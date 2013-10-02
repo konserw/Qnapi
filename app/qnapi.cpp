@@ -38,7 +38,31 @@ bool QNapi::checkTmpPath()
 
 bool QNapi::ppEnabled()
 {
-	return GlobalConfig().ppEnabled();
+    return GlobalConfig().ppEnabled();
+}
+
+bool QNapi::checkAll()
+{
+    if(!QNapi::checkP7ZipPath())
+    {
+        QMessageBox::warning(0, tr("Brak programu p7zip!"),
+                                tr("Ścieżka do programu p7zip jest nieprawidłowa!"));
+        return false;
+    }
+
+    if(!QNapi::checkTmpPath())
+    {
+        QMessageBox::warning(0, tr("Nieprawidłowy katalog tymczasowy!"),
+                                tr("Nie można pisać do katalogu tymczasowego! Sprawdź swoje ustawienia."));
+        return false;
+    }
+
+    if(getThread.queue.isEmpty())
+    {
+        QMessageBox::warning(0, tr("Brak plików!"),
+                                tr("Nie wskazano filmów do pobrania napisów!"));
+        return false;
+    }
 }
 
 QStringList QNapi::enumerateEngines()
@@ -94,14 +118,6 @@ bool QNapi::checkWritePermissions()
 	return QFileInfo(QFileInfo(movie).path()).isWritable();
 }
 
-void QNapi::checksum()
-{
-	foreach(QNapiAbstractEngine *e, enginesList)
-	{
-		e->checksum(movie);
-	}
-}
-
 bool QNapi::lookForSubtitles(QString lang, QString engine)
 {
 	subtitlesList.clear();
@@ -151,69 +167,6 @@ QList<QNapiSubtitleInfo> QNapi::listSubtitles()
 	return subtitlesList;
 }
 
-bool QNapi::needToShowList()
-{
-	theBestIdx = 0;
-
-	int i = 0;
-	bool foundBestIdx = false;
-	foreach(QNapiSubtitleInfo s, listSubtitles())
-	{
-		if(s.resolution == SUBTITLE_GOOD)
-		{
-			theBestIdx = i;
-			foundBestIdx = true;
-			break;
-		}
-		++i;
-	}
-
-	if(listSubtitles().size() <= 1)
-		return false;
-
-	if(GlobalConfig().downloadPolicy() == DP_ALWAYS_SHOW_LIST)	
-		return true;
-	if(GlobalConfig().downloadPolicy() == DP_NEVER_SHOW_LIST)	
-		return false;
-
-	return !foundBestIdx;
-}
-
-int QNapi::bestIdx()
-{
-	return theBestIdx;
-}
-
-bool QNapi::download(int i)
-{
-	QNapiSubtitleInfo s = subtitlesList[i];
-	currentEngine = engineByName(s.engine);
-	if(!currentEngine) return false;
-	int offset = offsetsList.value(s.engine, 0);
-	return currentEngine->download(i - offset);
-}
-
-bool QNapi::unpack()
-{
-	return currentEngine ? currentEngine->unpack() : false;
-}
-
-bool QNapi::match()
-{
-  //  return currentEngine ? currentEngine->match() : false;
-    return convert();
-}
-
-void QNapi::pp()
-{
-    if(currentEngine) currentEngine->pp();
-}
-
-bool QNapi::convert()
-{
-    return currentEngine ? currentEngine->convert() : false;
-}
-
 void QNapi::cleanup()
 {
 	foreach(QNapiAbstractEngine *e, enginesList)
@@ -254,3 +207,5 @@ QStringList QNapi::listLoadedEngines()
 	}
 	return list;
 }
+
+
