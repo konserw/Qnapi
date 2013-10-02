@@ -45,7 +45,6 @@ xmlrpc/response.cpp \
 forms/frmprogress.cpp \
 forms/frmoptions.cpp \
 forms/frmsummary.cpp \
-forms/frmlistsubtitles.cpp \
 qcumber/qinterprocesschannel.cpp \
 qcumber/qmanagedrequest.cpp \
 qcumber/qmanagedsocket.cpp \
@@ -73,7 +72,6 @@ xmlrpc/response.h \
 forms/frmprogress.h \
 forms/frmoptions.h \
 forms/frmsummary.h \
-forms/frmlistsubtitles.h \
 qcumber/qinterprocesschannel.h \
 qcumber/qmanagedrequest.h \
 qcumber/qmanagedsocket.h \
@@ -83,8 +81,7 @@ qcumber/qcumber.h
 FORMS += \
 forms/frmprogress.ui \
 forms/frmoptions.ui \
-forms/frmsummary.ui \
-forms/frmlistsubtitles.ui
+forms/frmsummary.ui
 
 RESOURCES += resources.qrc
 
