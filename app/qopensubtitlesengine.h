@@ -22,14 +22,13 @@
 #include "qnapiabstractengine.h"
 #include "xmlrpc/qsyncxmlrpcclient.h"
 #include "synchttp.h"
-#include "version.h"
 #include "qnapilanguage.h"
 
 class QOpenSubtitlesEngine : public QNapiAbstractEngine
 {
 public:
 
-	QOpenSubtitlesEngine(const QString & movieFile = "", const QString & subtitlesFile = "");
+    QOpenSubtitlesEngine(const QString & movieFile, const QString& lang);
 	~QOpenSubtitlesEngine();
 
 	// zwraca nazwe modulu
@@ -40,19 +39,15 @@ public:
 	QIcon engineIcon();
 
 	// oblicza sume kontrolna pliku filmowego
-	QString checksum(QString filename = "");
+    bool checksum();
 	// szuka napisow
-	bool lookForSubtitles(QString lang);
-	// wyniki wyszukiwania
-	QList<QNapiSubtitleInfo> listSubtitles();
+    bool lookForSubtitles();
 	// probuje pobrac napisy
-	bool download(int idx);
+    bool download();
 	// probuje rozpakowac napisy
 	bool unpack();
 
 private:
-
-    QString p7zipPath, lang, subFileName;
 	quint64 fileSize;
 
 	QSyncXmlRpcClient rpc;

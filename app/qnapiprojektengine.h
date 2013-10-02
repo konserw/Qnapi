@@ -32,21 +32,8 @@ class QNapiProjektEngine : public QNapiAbstractEngine
 {
 public:
 
-	enum UploadResult
-	{
-		NAPI_ADDED_NEW, NAPI_OK, NAPI_FAIL, NAPI_UNKNOWN
-	};
-
-	enum ReportResult
-	{
-		NAPI_REPORTED, NAPI_NO_SUBTITLES, NAPI_NOT_REPORTED
-	};
-
-	QNapiProjektEngine(const QString & movieFile = "", const QString & subtitlesFile = "");
+    QNapiProjektEngine(const QString & movieFile, const QString &lang = QString());
 	~QNapiProjektEngine();
-
-    bool match()
-    { return QNapiAbstractEngine::convert(); }
 
 	// zwraca nazwe modulu
 	QString engineName();
@@ -55,45 +42,21 @@ public:
 	// zwraca ikone silnika pobierania
     QIcon engineIcon();
 
-	QString checksum(QString filename = "");
-	bool lookForSubtitles(QString lang);
-	QList<QNapiSubtitleInfo> listSubtitles();
-	bool download(int idx);
+    bool checksum();
+    bool lookForSubtitles();
+    bool download();
     bool unpack();
 
-	QString name()
-	{
-		return QString("NapiProjekt");
-	}
-
-	static bool createUser(const QString & nick, const QString & pass,
-							const QString & email, QString * response);
-	static bool checkUser(const QString & nick, const QString & pass);
-	UploadResult uploadSubtitles(const QString & language, const QString & nick,
-									const QString & pass, bool correct = false,
-									const QString & comment = "");
-	ReportResult reportBad(const QString & language, const QString & nick, const QString & pass,
-							const QString & comment, QString *response);
+    void cleanup();
 
 private:
+    QNapiSubtitleInfo* m_info;
 
-    QString p7zipPath, nick, pass;
-
-	QList<QNapiSubtitleInfo> subtitlesList;
-
-	QString checksum(QString filename, bool limit10M);
 	QString npFDigest(const QString & input);
-	QString npLangWrapper(QString lang);
+    QString npLangWrapper(QString m_lang);
 
-    static const unsigned long NAPI_10MB;
-    static const QString napiDownloadUrlTpl;
-    static const QString napiCheckUserUrlTpl;
-    static const QString napiUploadUrlTpl;
-    static const QString napiUploadUrlSimpleTpl;
-    static const QString napiReportBadUrlTpl;
-    static const QString napiCreateUserUrlTpl;
-    static const QString napiZipPassword;
-
+    static const QString m_napiDownloadUrlTpl;
+    static const QString m_napiZipPassword;
 };
 
 #endif

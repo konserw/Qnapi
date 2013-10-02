@@ -13,32 +13,26 @@
 *****************************************************************************/
 
 #include "qnapiprojektengine.h"
+#include "qnapisubtitleinfo.h"
+#include <QFile>
+#include <QIcon>
+#include <QPixmap>
 
-const unsigned long QNapiProjektEngine::NAPI_10MB = 10485760;
-const QString QNapiProjektEngine::napiDownloadUrlTpl= "http://www.napiprojekt.pl/unit_napisy/dl.php?l=%1&f=%2&t=%3&v=other&kolejka=false&nick=%4&pass=%5&napios=%6";
-const QString QNapiProjektEngine::napiCheckUserUrlTpl = "http://www.napiprojekt.pl/users_check.php?nick=%1&pswd=%2";
-const QString QNapiProjektEngine::napiUploadUrlTpl = "http://www.napiprojekt.pl/unit_napisy/upload.php?m_length=%1&m_resolution=%2x%3&m_fps=%4&m_hash=%5&m_filesize=%6";
-const QString QNapiProjektEngine::napiUploadUrlSimpleTpl = "http://www.napiprojekt.pl/unit_napisy/upload.php?m_hash=%5&m_filesize=%6";
-const QString QNapiProjektEngine::napiReportBadUrlTpl = "http://www.napiprojekt.pl/unit_napisy/zlenapisyadd.php";
-const QString QNapiProjektEngine::napiCreateUserUrlTpl = "http://www.napiprojekt.pl/users_add.php";
-const QString QNapiProjektEngine::napiZipPassword = "iBlm8NTigvru0Jr0";
+const QString QNapiProjektEngine::m_napiDownloadUrlTpl= "http://www.napiprojekt.pl/unit_napisy/dl.php?l=%1&f=%2&t=%3&v=other&kolejka=false&nick=%4&pass=%5&napios=%6";
+const QString QNapiProjektEngine::m_napiZipPassword = "iBlm8NTigvru0Jr0";
 
 
 // konstruktor klasy
-QNapiProjektEngine::QNapiProjektEngine(const QString & movieFile, const QString & subtitlesFile)
-    : QNapiAbstractEngine(movieFile, subtitlesFile)
+QNapiProjektEngine::QNapiProjektEngine(const QString & movieFile, const QString &lang)
+    : QNapiAbstractEngine()
 {
-	p7zipPath = GlobalConfig().p7zipPath();
-	nick = GlobalConfig().nick(engineName());
-	pass = GlobalConfig().pass(engineName());
-	noBackup = GlobalConfig().noBackup();
-	tmpPackedFile =  QString("%1/%2").arg(tmpPath).arg(generateTmpFileName());
+    m_info = new QNapiSubtitleInfo(movieFile, lang);
 }
 
 // destruktor klasy
 QNapiProjektEngine::~QNapiProjektEngine()
 {
-	cleanup();
+    delete m_info;
 }
 
 
@@ -85,27 +79,46 @@ QIcon QNapiProjektEngine::engineIcon()
 }
 
 // oblicza sume kontrolna dla pliku filmowego (md5 z pierwszych 10MB pliku)
-QString QNapiProjektEngine::checksum(QString filename)
+bool QNapiProjektEngine::checksum()
 {
-	if(filename.isEmpty())
-		filename = movie;
-	return (checkSum = checksum(filename, true));
+    QFile file(m_info->moviePath());
+    QByteArray fileArray;
+
+    if(!file.open(QIODevice::ReadOnly))
+        return false;
+
+    fileArray = file.read(10485760);
+    file.close();
+
+    QByteArray b = QCryptographicHash::hash(fileArray, QCryptographicHash::Md5);
+    fileArray.clear();
+
+    QString checkSum;
+    char next[3];
+
+    for(int i = 0; i < 16; i++)
+    {
+        snprintf(next, 3, "%.2x", (unsigned char)b[i]);
+        checkSum += next;
+    }
+    m_info->setCheckSum(checkSum);
+
+    return true;
 }
 
 
-bool QNapiProjektEngine::lookForSubtitles(QString lang)
+bool QNapiProjektEngine::lookForSubtitles()
 {
-	if(checkSum.isEmpty()) return false;
-
-	subtitlesList.clear();
+    if(!m_info->hasChecksum()) return false;
 
 	SyncHTTP http;
-	QString urlTxt = napiDownloadUrlTpl.arg(npLangWrapper(lang))
-										.arg(checkSum)
-										.arg(npFDigest(checkSum))
-										.arg(nick)
-										.arg(pass)
-										.arg("Linux/UNIX");
+    QString urlTxt = m_napiDownloadUrlTpl
+            .arg(npLangWrapper(m_info->lang()))
+            .arg(m_info->checkSum())
+            .arg(npFDigest(m_info->checkSum()))
+            .arg("NapiProjekt")
+            .arg("NapiProjekt")
+            .arg("Linux/UNIX");
 
 	QUrl url(urlTxt);
 
@@ -127,341 +140,53 @@ bool QNapiProjektEngine::lookForSubtitles(QString lang)
 	
 	if(!r) return false;
 	
-	subtitlesList << QNapiSubtitleInfo(	lang,
-										engineName(),
-										urlTxt,
-										QFileInfo(movie).completeBaseName(),
-										"",
-                                        "srt",
-										SUBTITLE_UNKNOWN);
+    subInfo = new QNapiSubtitleInfo(m_lang,
+                                engineName(),
+                                urlTxt,
+                                QFileInfo(movie).completeBaseName(),
+                                "",
+                                "txt",
+                                SUBTITLE_UNKNOWN);
 
-	return (subtitlesList.size() > 0);
-}
-
-QList<QNapiSubtitleInfo> QNapiProjektEngine::listSubtitles()
-{
-	return subtitlesList;
+    return true;
 }
 
 // Probuje pobrac napisy do filmu z serwera NAPI
-bool QNapiProjektEngine::download(int idx)
+bool QNapiProjektEngine::download()
 {
-	Q_UNUSED(idx)
-	
-	return (subtitlesList.size() > 0);
+    return (subInfo != 0);
 }
 
 // Probuje rozpakowac napisy do filmu
 bool QNapiProjektEngine::unpack()
 {
-	if(!QFile::exists(tmpPackedFile)) return false;
-	if(!QFile::exists(movie)) return false;
+    if(!QFile::exists(tmpPackedFile)) return false;
 	subtitlesTmp = tmpPath + "/" + checkSum + ".txt";
 
 	if(QFile::exists(subtitlesTmp))
 		QFile::remove(subtitlesTmp);
 
 	QStringList args;
-	args << "e" << "-y" << ("-p" + napiZipPassword) << ("-o" + tmpPath) << tmpPackedFile;
+    args << "e" << "-y" << ("-p" + m_napiZipPassword) << ("-o" + tmpPath) << tmpPackedFile;
 
 	QProcess p7zip;
-	p7zip.start(p7zipPath, args);
+    p7zip.start(GlobalConfig().p7zipPath(), args);
 
 	// Rozpakowujemy napisy max w ciagu 5 sekund
 	if(!p7zip.waitForFinished(5000)) return false;
 
-	subtitlesTmp = tmpPath + "/" + checkSum + ".txt";
-	return QFile::exists(subtitlesTmp);
+    return QFile::exists(subtitlesTmp);
 }
 
-// Tworzy konto uzytkownika na serwerze NAPI
-bool QNapiProjektEngine::createUser(const QString & nick, const QString & pass,
-									const QString & email, QString * response)
+void QNapiProjektEngine::cleanup()
 {
-	QMultipartHttpRequest postData;
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"login\"");
-	postData.addData(nick);
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"haslo\"");
-	postData.addData(pass);
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"mail\"");
-	postData.addData(email);
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"z_programu\"");
-	postData.addData(QString("true"));
-
-	postData.addEndingBoundary();
-
-	QByteArray data = postData.requestStream();
-
-	QUrl url(napiCreateUserUrlTpl);
-
-	QHttpRequestHeader header("POST", url.path());
-
-	header.setValue("Host", url.host());
-	header.setValue("Accept", "text/html, */*");
-	header.setValue("Content-Type", "multipart/form-data; boundary=" + postData.boundaryTxt());
-	header.setValue("Connection", "keep-alive");
-	header.setValue("User-Agent", QString("QNapi ") + QNAPI_VERSION);
-
-	SyncHTTP http;
-	http.setHost(url.host());
-	if(!http.syncRequest(header, data))
-		return false;
-
-	*response = QTextCodec::codecForName("windows-1250")->toUnicode(http.readAll());
-
-	return true;
+    if(QFile::exists(info.tmpPackedFile))
+        QFile::remove(tmpPackedFile);
+    if(QFile::exists(subtitlesTmp))
+        QFile::remove(subtitlesTmp);
+    if(QFile::exists(scriptPath))
+        QFile::remove(scriptPath);
 }
-
-// Sprawdza uzytkownika w bazie
-bool QNapiProjektEngine::checkUser(const QString & nick, const QString & pass)
-{
-	SyncHTTP http;
-	QString urlTxt = napiCheckUserUrlTpl.arg(nick).arg(pass);
-
-	QUrl url(urlTxt);
-	http.setHost(url.host());
-    http.syncGet(url.path() + "?" + url.query(QUrl::EncodeDelimiters | QUrl::EncodeReserved | QUrl::EncodeSpaces | QUrl::EncodeUnicode));
-
-	QString buffer = http.readAll();
-	if(buffer.indexOf("ok") == 0) return true;
-	return false;
-}
-
-// Wrzuca napisy do bazy NAPI
-QNapiProjektEngine::UploadResult
-	QNapiProjektEngine::uploadSubtitles(const QString & language, const QString & nick,
-										const QString & pass, bool correct, const QString & comment)
-{
-	if(!QFile::exists(movie) || !QFile::exists(subtitles))
-		return NAPI_FAIL;
-
-	MovieInfo movieInfo(movie);
-
-	unsigned long movie_size = QFileInfo(movie).size();
-	QString movie_md5 = checksum(movie);
-	QString subtitles_md5 = checksum(subtitles, false);
-
-	QString newSubtitlesName = tmpPath + "/" + movie_md5 + ".txt";
-	if(QFile::exists(newSubtitlesName)) QFile::remove(newSubtitlesName);
-	if(!QFile::copy(subtitles, newSubtitlesName))
-		return NAPI_FAIL;
-
-	QString zipFileName = QFileInfo(newSubtitlesName).path() + "/"
-							+ QFileInfo(newSubtitlesName).completeBaseName() + ".zip";
-
-	if(QFile::exists(zipFileName))
-		QFile::remove(zipFileName);
-
-	QStringList args;
-    args << "a" << "-t7z" << "-bd" << "-y" << "-l";
-	args << zipFileName << (QString("-p")+napiZipPassword) << newSubtitlesName;
-
-	QProcess p7zip;
-	p7zip.start(p7zipPath, args);
-
-	if(!p7zip.waitForFinished())
-		return NAPI_FAIL;
-
-	QFile::remove(newSubtitlesName);
-
-	if(!QFile::exists(zipFileName))
-		return NAPI_FAIL;
-
-	// Przygotowujemy dane do zapytania POST
-	QMultipartHttpRequest postData;
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"kmt\"");
-	postData.addData(comment);
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"poprawka\"");
-	postData.addData(QString(correct ? "true" : "false"));
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"v\"");
-	postData.addData(QString("other"));
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"l\"");
-	postData.addData(npLangWrapper(language));
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"t\"");
-	postData.addData(npFDigest(movie_md5));
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"m_filename\"");
-	postData.addData(QFileInfo(movie).fileName());
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"nick\"");
-	postData.addData(nick);
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"pass\"");
-	postData.addData(pass);
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"s_hash\"");
-	postData.addData(subtitles_md5);
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"MAX_FILE_SIZE\"");
-	postData.addData(QString("512000"));
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"plik\"; filename=\"" +
-		QFileInfo(zipFileName).fileName() + "\"");
-	postData.addContentType("subtitles/zip");
-
-	QFile fZip(zipFileName);
-	if(!fZip.open(QIODevice::ReadOnly))
-		return NAPI_FAIL;
-
-	postData.addData(fZip.readAll());
-	postData.addEndingBoundary();
-
-	fZip.close();
-	QFile::remove(zipFileName);
-
-	QByteArray data = postData.requestStream();
-
-	QString movie_fps = QString::number((int)ceil(movieInfo.fps * 100));
-	movie_fps.insert(2, ',');
-
-	QString urlTxt;
-	
-	if(movieInfo.isErr)
-	{
-		urlTxt = napiUploadUrlSimpleTpl.arg(movie_md5).arg(movie_size);
-	}
-	else
-	{
-		urlTxt = napiUploadUrlTpl.arg(movieInfo.time).arg(movieInfo.width)
-									.arg(movieInfo.height).arg(movie_fps)
-									.arg(movie_md5).arg(movie_size);
-	}
-
-	QUrl url(urlTxt);
-
-    QHttpRequestHeader header("POST", url.path() + "?" + url.query(QUrl::EncodeDelimiters | QUrl::EncodeReserved | QUrl::EncodeSpaces | QUrl::EncodeUnicode));
-
-	header.setValue("Host", url.host());
-	header.setValue("Accept", "text/html, */*");
-	header.setValue("Content-Type", "multipart/form-data; boundary=" + postData.boundaryTxt());
-	header.setValue("Connection", "keep-alive");
-	header.setValue("User-Agent", QString("QNapi ") + QNAPI_VERSION);
-
-	SyncHTTP http;
-	http.setHost(url.host());
-	if(!http.syncRequest(header, data))
-		return NAPI_FAIL;
-
-	QString response = http.readAll();
-
-	if(response.indexOf("NPc0") == 0)
-		return NAPI_ADDED_NEW;
-	if((response.indexOf("NPc2") == 0) || (response.indexOf("NPc3") == 0))
-		return NAPI_OK;
-	return NAPI_UNKNOWN;
-}
-
-// Wysyla blad o niepasujacyh napisach
-QNapiProjektEngine::ReportResult
-	QNapiProjektEngine::reportBad(const QString & language, const QString & nick, const QString & pass,
-									const QString & comment, QString *response)
-{
-	QFileInfo fi(movie);
-	subtitles = fi.path() + "/" + fi.completeBaseName() + ".txt";
-
-	if(!QFile::exists(subtitles))
-		return NAPI_NO_SUBTITLES;
-
-	checksum();
-
-	QMultipartHttpRequest postData;
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"nick\"");
-	postData.addData(nick);
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"pass\"");
-	postData.addData(pass);
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"l\"");
-	postData.addData(npLangWrapper(language));
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"md5\"");
-	postData.addData(checkSum);
-
-	postData.addBoundary();
-	postData.addContentDisposition("name=\"kmt\"");
-	postData.addData(comment);
-	postData.addEndingBoundary();
-
-	QByteArray data = postData.requestStream();
-
-	QUrl url(napiReportBadUrlTpl);
-
-	QHttpRequestHeader header("POST", url.path());
-
-	header.setValue("Host", url.host());
-	header.setValue("Accept", "text/html, */*");
-	header.setValue("Content-Type", "multipart/form-data; boundary=" + postData.boundaryTxt());
-	header.setValue("Connection", "keep-alive");
-	header.setValue("User-Agent", QString("QNapi ") + QNAPI_VERSION);
-
-	SyncHTTP http;
-	http.setHost(url.host());
-	if(!http.syncRequest(header, data))
-		return NAPI_NOT_REPORTED;
-
-	*response = QTextCodec::codecForName("windows-1250")->toUnicode(http.readAll());
-
-	return NAPI_REPORTED;
-}
-
-
-// oblicza sume kontrolna dla pliku filmowego (md5 z pierwszych 10MB pliku)
-QString QNapiProjektEngine::checksum(QString filename, bool limit10M)
-{
-	QFile file(filename);
-	QByteArray fileArray;
-
-	if(!file.open(QIODevice::ReadOnly))
-		return QString("");
-
-	fileArray = limit10M ? file.read(NAPI_10MB) : file.readAll();
-	file.close();
-
-	QByteArray b = QCryptographicHash::hash(fileArray, QCryptographicHash::Md5);
-	fileArray.clear();
-
-	QString out;
-	char next[3];
-
-	for(int i = 0; i < 16; i++)
-	{
-		snprintf(next, 3, "%.2x", (unsigned char)b[i]);
-		out += next;
-	}
-	
-	checkSum = out;
-	return checkSum;
-}
-
 // Tajemnicza funkcja f()
 QString QNapiProjektEngine::npFDigest(const QString & input)
 {
