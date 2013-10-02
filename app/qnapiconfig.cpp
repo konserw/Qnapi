@@ -32,7 +32,7 @@ void QNapiConfig::reload()
 
 void QNapiConfig::save()
 {
-	settings->setValue("qnapi/version", QNAPI_VERSION);
+    settings->setValue("qnapi/version", VERSION);
 	settings->setValue("qnapi/firstrun", false);
 	settings->sync();
 }

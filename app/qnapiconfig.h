@@ -25,7 +25,6 @@
 #include <QRegExp>
 #include <QList>
 #include <QPair>
-#include "version.h"
 
 enum SearchPolicy
 {

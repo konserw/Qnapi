@@ -17,11 +17,7 @@
 #include <QStringList>
 #include <QTextCodec>
 #include <QTranslator>
-//#include <QLibraryInfo>
-//#include <QLocale>
 #include <signal.h>
-
-#include "version.h"
 #include "qnapiconfig.h"
 #include "qnapicli.h"
 #include "forms/frmprogress.h"
