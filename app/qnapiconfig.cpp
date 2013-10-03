@@ -11,8 +11,14 @@
 ** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 **
 *****************************************************************************/
-
+#include <QFileInfo>
+#include <QApplication>
+#include <QDir>
+#include <QProcess>
+#include <QRegExp>
 #include "qnapiconfig.h"
+
+QNapiConfig* QNapiConfig::m_instance = nullptr;
 
 QNapiConfig::QNapiConfig()
 {
@@ -22,6 +28,13 @@ QNapiConfig::QNapiConfig()
 QNapiConfig::~QNapiConfig()
 {
 	if(settings) delete settings;
+}
+
+QNapiConfig *QNapiConfig::instance()
+{
+    if(m_instance == nullptr)
+        m_instance = new QNapiConfig;
+    return m_instance;
 }
 
 void QNapiConfig::reload()
@@ -61,11 +74,6 @@ QString QNapiConfig::p7zipPath()
 
 	if(paths.size() == 0)
 		paths << "/usr/bin" << "/usr/local/bin";
-
-#ifdef Q_WS_MAC
-	// Pod MacOS X 7zip jest w zasobach aplikacji
-	paths << QDir(QApplication::applicationDirPath() + "/../Resources").canonicalPath();
-#endif
 
 	QStringList binaries;
 	binaries << "7z" << "7za" << "7zr" << "p7zip";
@@ -108,53 +116,6 @@ void QNapiConfig::setTmpPath(const QString & path)
 	settings->setValue("qnapi/tmp_path", path);
 }
 
-QString QNapiConfig::nick(const QString & engine)
-{
-	QString nick = settings->value(engine + "/nick", "").toString();
-
-	// Konwersja z konfigow <= 0.1.5
-	if(nick.isEmpty() && (engine == "NapiProjekt"))
-	{
-		nick = settings->value("qnapi/nick", "").toString();
-
-		if(!nick.isEmpty())
-		{
-			settings->remove("qnapi/nick");
-			setNick("NapiProjekt", nick);
-		}
-	}
-
-	return nick;
-}
-
-void QNapiConfig::setNick(const QString & engine, const QString & nick)
-{
-	settings->setValue(engine + "/nick", nick);
-}
-
-QString QNapiConfig::pass(const QString & engine)
-{
-	QString pass = settings->value(engine + "/pass", "").toString();
-
-	if(pass.isEmpty() && (engine == "NapiProjekt"))
-	{
-		pass = settings->value("qnapi/pass", "").toString();
-
-		if(!pass.isEmpty())
-		{
-			settings->remove("qnapi/pass");
-			setPass("NapiProjekt", pass);
-		}
-	}
-
-	return pass;
-}
-
-void QNapiConfig::setPass(const QString & engine, const QString & pass)
-{
-	settings->setValue(engine + "/pass", pass);
-}
-
 QString QNapiConfig::language()
 {
 	return settings->value("qnapi/language", "pl").toString();
@@ -164,166 +125,6 @@ void QNapiConfig::setLanguage(const QString & language)
 {
 	settings->setValue("qnapi/language", language);
 }
-
-bool QNapiConfig::noBackup()
-{
-	return settings->value("qnapi/no_backup", false).toBool();
-}
-
-void QNapiConfig::setNoBackup(bool noBackup)
-{
-	settings->setValue("qnapi/no_backup", noBackup);
-}
-
-
-bool QNapiConfig::useBrushedMetal()
-{
-	return settings->value("qnapi/use_brushed_metal", false).toBool();
-}
-
-void QNapiConfig::setUseBrushedMetal(bool use)
-{
-	settings->setValue("qnapi/use_brushed_metal", use);
-}
-
-QList<QPair<QString, bool> > QNapiConfig::engines()
-{
-	QList<QVariant> inList = settings->value("qnapi/engines").toList();
-	QList<QPair<QString, bool> > map;
-
-	foreach(QVariant v, inList)
-	{
-		QStringList sl = v.toStringList();
-		if(sl.size() != 2) continue;
-
-		QString key = sl.at(0);
-		bool value = (sl.at(1) == "1");
-		map << qMakePair(key, value);
-	}
-
-	if(map.isEmpty())
-	{
-		map << QPair<QString,bool>("NapiProjekt", true)
-			<< QPair<QString,bool>("OpenSubtitles", true);
-	}
-
-	return map;
-}
-
-QStringList QNapiConfig::enginesList()
-{
-	QList<QPair<QString, bool> > map = engines();
-	QStringList list;
-
-	for(int i = 0; i < map.size(); ++i)
-	{
-		QPair<QString,bool> e = map.at(i);
-		if(e.second) list << e.first;
-	}
-
-	if(list.isEmpty())
-	{
-		list << "NapiProjekt" << "OpenSubtitles";
-	}
-
-	return list;
-}
-
-void QNapiConfig::setEngines(QList<QPair<QString, bool> > engines)
-{
-	QList<QVariant> outList;
-	for(int i = 0; i < engines.size(); ++i)
-	{
-		QPair<QString, bool> e = engines.at(i);
-
-		QStringList sl;
-		sl << e.first << (e.second ? "1" : "0");
-		outList << sl;
-	}
-
-	settings->setValue("qnapi/engines", outList);
-}
-
-SearchPolicy QNapiConfig::searchPolicy()
-{
-	return (SearchPolicy)settings->value("qnapi/search_policy", 0).toInt();
-}
-
-void QNapiConfig::setSearchPolicy(SearchPolicy policy)
-{
-	settings->setValue("qnapi/search_policy", policy);
-}
-
-DownloadPolicy QNapiConfig::downloadPolicy()
-{
-	return (DownloadPolicy)settings->value("qnapi/download_policy", 1).toInt();
-}
-
-void QNapiConfig::setDownloadPolicy(DownloadPolicy policy)
-{
-	settings->setValue("qnapi/download_policy", policy);
-}
-
-bool QNapiConfig::ppEnabled()
-{
-	return settings->value("qnapi/post_processing", false).toBool();
-}
-
-void QNapiConfig::setPpEnabled(bool enable)
-{
-	settings->setValue("qnapi/post_processing", enable);
-}
-
-bool QNapiConfig::ppChangeEncoding()
-{
-	return settings->value("qnapi/change_encoding", false).toBool();
-}
-
-void QNapiConfig::setPpChangeEncoding(bool change)
-{
-	settings->setValue("qnapi/change_encoding", change);
-}
-
-bool QNapiConfig::ppAutoDetectEncoding()
-{
-	return settings->value("qnapi/auto_detect_encoding", false).toBool();
-}
-
-void QNapiConfig::setPpAutoDetectEncoding(bool change)
-{
-	settings->setValue("qnapi/auto_detect_encoding", change);
-}
-
-QString QNapiConfig::ppEncodingFrom()
-{
-	return settings->value("qnapi/enc_from", "windows-1250").toString();
-}
-
-void QNapiConfig::setPpEncodingFrom(const QString & encoding)
-{
-	settings->setValue("qnapi/enc_from", encoding);
-}
-
-QString QNapiConfig::ppEncodingTo()
-{
-	return settings->value("qnapi/enc_to", "UTF-8").toString();
-}
-
-void QNapiConfig::setPpEncodingTo(const QString & encoding)
-{
-	settings->setValue("qnapi/enc_to", encoding);
-}
-
-bool QNapiConfig::ppShowAllEncodings()
-{
-	return settings->value("qnapi/show_all_encodings", false).toBool();
-}
-
-void QNapiConfig::setPpShowAllEncodings(bool show)
-{
-	settings->setValue("qnapi/show_all_encodings", show);
-}
-
 bool QNapiConfig::ppRemoveLines()
 {
 	return settings->value("qnapi/remove_lines", false).toBool();
@@ -393,53 +194,7 @@ void QNapiConfig::setPreviousDialogPath(const QString & path)
 	settings->setValue("qnapi/prev_dialog_path", path);
 }
 
-QStringList QNapiConfig::scanFilters()
-{
-	QStringList defaultScanFilters;
-	defaultScanFilters << "*.avi *.asf *.divx *.mkv *.mov *.mp4 *.mpeg"
-							" *.mpg *.ogm *.rm *.rmvb *.wmv" << "*.*";
-
-	return settings->value("scan/filters", defaultScanFilters).toStringList();
-}
-
-void QNapiConfig::setScanFilters(const QStringList & filters)
-{
-	settings->setValue("scan/filters", filters);
-}
-
-QString QNapiConfig::scanSkipFilters()
-{
-	return settings->value("scan/skip_filters", "PL dubbing").toString();
-}
-
-void QNapiConfig::setScanSkipFilters(const QString & filters)
-{
-	settings->setValue("scan/skip_filters", filters);
-}
-
-bool QNapiConfig::scanSkipIfSubtitlesExists()
-{
-	return settings->value("scan/skip_if_subtitles_exists", false).toBool();
-}
-
-void QNapiConfig::setScanSkipIfSubtitlesExists(bool skip)
-{
-	settings->setValue("scan/skip_if_subtitles_exists", skip);
-}
-
-QString QNapiConfig::lastScanDir()
-{
-	return settings->value("scan/last_scan_dir", "").toString();
-}
-
-void QNapiConfig::setLastScanDir(const QString & dir)
-{
-	settings->setValue("scan/last_scan_dir", dir);
-}
-
-
 QNapiConfig & GlobalConfig()
 {
-	static QNapiConfig cfg;
-	return cfg;
+    return *QNapiConfig::instance();
 }

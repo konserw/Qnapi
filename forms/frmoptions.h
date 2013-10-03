@@ -16,18 +16,7 @@
 #define __FRMOPTIONS__H__
 
 #include <QDialog>
-#include <QFileDialog>
-#include <QFileInfo>
-#include <QDir>
-#include <QMessageBox>
-#include <QList>
-#include <QTextCodec>
-#include <QDesktopWidget>
-
 #include "ui_frmoptions.h"
-#include "qnapiconfig.h"
-#include "qnapilanguage.h"
-
 
 class frmOptions: public QDialog
 {
@@ -46,19 +35,10 @@ Q_OBJECT
 		void select7zPath();
 		void leTmpPathChanged();
 		void selectTmpPath();
-
-		void twEnginesSelectionChanged();
-		void twEnginesItemChanged(QTableWidgetItem * item);
-		void pbMoveUpClicked();
-        void pbMoveDownClicked();
-        void pbEngineInfoClicked();
-
 		void restoreDefaults();
 
 	private:
-		Ui::frmOptions ui;
-		void showAllEncodings();
-		
+        Ui::frmOptions ui;
 };
 
 #endif

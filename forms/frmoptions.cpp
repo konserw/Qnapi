@@ -11,8 +11,17 @@
 ** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 **
 *****************************************************************************/
-
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QDir>
+#include <QMessageBox>
+#include <QList>
+#include <QTextCodec>
+#include <QDesktopWidget>
 #include "frmoptions.h"
+#include "qnapiconfig.h"
+#include "qnapilanguage.h"
+
 
 frmOptions::frmOptions(QWidget * parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
@@ -31,14 +40,6 @@ frmOptions::frmOptions(QWidget * parent, Qt::WindowFlags f) : QDialog(parent, f)
 	connect(ui.pb7zPathSelect, SIGNAL(clicked()), this, SLOT(select7zPath()));
 	connect(ui.leTmpPath, SIGNAL(textChanged(const QString &)), this, SLOT(leTmpPathChanged()));
 	connect(ui.pbTmpPathSelect, SIGNAL(clicked()), this, SLOT(selectTmpPath()));
-
-	connect(ui.twEngines, SIGNAL(itemSelectionChanged()), this, SLOT(twEnginesSelectionChanged()));
-	connect(ui.twEngines, SIGNAL(itemChanged(QTableWidgetItem *)), this, SLOT(twEnginesItemChanged(QTableWidgetItem *)));
-
-	connect(ui.pbMoveUp, SIGNAL(clicked()), this, SLOT(pbMoveUpClicked()));
-	connect(ui.pbMoveDown, SIGNAL(clicked()), this, SLOT(pbMoveDownClicked()));
-	connect(ui.pbEngineInfo, SIGNAL(clicked()), this, SLOT(pbEngineInfoClicked()));
-
 	connect(ui.pbRestoreDefaults, SIGNAL(clicked()), this, SLOT(restoreDefaults()));
 
 	// workaround dla compiza?
@@ -95,109 +96,11 @@ void frmOptions::selectTmpPath()
 		ui.leTmpPath->setText(QFileInfo(tmpDir).path());
 }
 
-void frmOptions::twEnginesSelectionChanged()
-{
-	QNapi n;
-	n.addEngines(n.enumerateEngines());
-	
-	if(ui.twEngines->selectedItems().size() < 1)
-		return;	
-	
-	int currentRow = ui.twEngines->row(ui.twEngines->selectedItems().at(0));
-
-	ui.pbMoveUp->setEnabled(currentRow > 0);
-	ui.pbMoveDown->setEnabled(currentRow < ui.twEngines->rowCount() - 1);
-	ui.pbEngineInfo->setEnabled(true);
-}
-
-void frmOptions::twEnginesItemChanged(QTableWidgetItem * item)
-{
-	bool foundActive = false;
-
-	for(int i = 0; i < ui.twEngines->rowCount(); ++i)
-	{
-		if(!ui.twEngines->item(i, 0))
-		{
-			return;
-		}
-		
-		if(ui.twEngines->item(i, 0)->checkState() == Qt::Checked)
-		{
-			foundActive = true;
-			break;
-		}
-	}
-	
-	if(!foundActive)
-	{
-		item->setCheckState(Qt::Checked);
-		QMessageBox::warning(this,
-							"Ostrzeżenie",
-							"Przynajmniej jeden moduł pobierania musi pozostać aktywny!");
-
-	}
-	
-}
-
-void frmOptions::pbMoveUpClicked()
-{
-	int currentRow = ui.twEngines->row(ui.twEngines->selectedItems().at(0));
-
-	QTableWidgetItem *current, *above;
-	current = ui.twEngines->item(currentRow, 0);
-	above = ui.twEngines->item(currentRow - 1, 0);
-
-	QTableWidgetItem tmp = *current;
-	*current = *above;
-	*above = tmp;
-
-	ui.twEngines->selectRow(currentRow - 1);
-}
-
-void frmOptions::pbMoveDownClicked()
-{
-	int currentRow = ui.twEngines->row(ui.twEngines->selectedItems().at(0));
-
-	QTableWidgetItem *current, *below;
-	current = ui.twEngines->item(currentRow, 0);
-	below = ui.twEngines->item(currentRow + 1, 0);
-
-	QTableWidgetItem tmp = *current;
-	*current = *below;
-	*below = tmp;
-
-	ui.twEngines->selectRow(currentRow + 1);
-}
-
-void frmOptions::pbEngineInfoClicked()
-{
-	QNapi n;
-	n.addEngines(n.enumerateEngines());
-	QString engineName = ui.twEngines->selectedItems().at(0)->text();
-	QString engineInfo = n.engineByName(engineName)->engineInfo();
-	
-	QMessageBox::information(	this,
-								QString("Informacje o silniku %1").arg(engineName),
-								engineInfo);
-}
-
 void frmOptions::writeConfig()
 {
 	GlobalConfig().setP7zipPath(ui.le7zPath->text());
 	GlobalConfig().setTmpPath(ui.leTmpPath->text());
 	GlobalConfig().setLanguage(ui.cbLang->itemData(ui.cbLang->currentIndex()).toString());
-
-	QList<QPair<QString, bool> > engines;
-	for(int i = 0; i < ui.twEngines->rowCount(); ++i)
-	{
-		engines << qMakePair(ui.twEngines->item(i, 0)->text(),
-							(ui.twEngines->item(i, 0)->checkState() == Qt::Checked));
-	}
-
-	GlobalConfig().setEngines(engines);
-	
-	GlobalConfig().setSearchPolicy((SearchPolicy)ui.cbSearchPolicy->currentIndex());
-	GlobalConfig().setDownloadPolicy((DownloadPolicy)ui.cbDownloadPolicy->currentIndex());
 
 	GlobalConfig().setPpRemoveLines(ui.cbRemoveLines->isChecked());
 	GlobalConfig().setPpRemoveWords(ui.teRemoveWords->toPlainText().split("\n"));
@@ -219,33 +122,6 @@ void frmOptions::readConfig()
 	ui.leTmpPath->setText(GlobalConfig().tmpPath());
 	ui.cbLang->setCurrentIndex(ui.cbLang->findData(QNapiLanguage(GlobalConfig().language()).toTwoLetter()));
 
-	QNapi n;
-	n.addEngines(n.enumerateEngines());
-
-	ui.twEngines->clear();
-
-	QList<QPair<QString,bool> > engines = GlobalConfig().engines();
-	ui.twEngines->setColumnCount(1);
-	ui.twEngines->setRowCount(engines.size());
-
-	for(int i = 0; i < engines.size(); ++i)
-	{
-		QPair<QString,bool> e = engines.at(i);
-		QTableWidgetItem *item = new QTableWidgetItem(n.engineByName(e.first)->engineIcon(), e.first);
-		item->setCheckState(e.second ? Qt::Checked : Qt::Unchecked);
-		ui.twEngines->setItem(i, 0, item);
-	}
-
-	ui.twEngines->horizontalHeader()->hide();
-	ui.twEngines->verticalHeader()->hide();
-	ui.twEngines->verticalHeader()->setDefaultSectionSize(20);
-    ui.twEngines->verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-	ui.twEngines->setColumnWidth(0, 300);
-
-
-	ui.cbSearchPolicy->setCurrentIndex(GlobalConfig().searchPolicy());
-	ui.cbDownloadPolicy->setCurrentIndex(GlobalConfig().downloadPolicy());
-
 	ui.cbRemoveLines->setChecked(GlobalConfig().ppRemoveLines());
 	ui.teRemoveWords->setText(GlobalConfig().ppRemoveWords().join("\n"));
 	ui.cbChangePermissions->setChecked(GlobalConfig().ppChangePermissions());
@@ -258,8 +134,6 @@ void frmOptions::readConfig()
 	ui.sbUPerm->setValue((o <= 7) ? o : 6);
 	ui.sbGPerm->setValue((g <= 7) ? g : 4);
 	ui.sbOPerm->setValue((u <= 7) ? u : 4);
-
-	ui.gbPpEnable->setChecked(GlobalConfig().ppEnabled());
 }
 
 void frmOptions::restoreDefaults()
@@ -267,13 +141,8 @@ void frmOptions::restoreDefaults()
 	GlobalConfig().setP7zipPath("");
 	GlobalConfig().setTmpPath(QDir::tempPath());
     GlobalConfig().setLanguage("pl");
-	QList<QPair<QString, bool> > engines;
-	engines << QPair<QString, bool>("NapiProjekt", true)
-			<< QPair<QString, bool>("OpenSubtitles", true);
-	GlobalConfig().setEngines(engines);
-    GlobalConfig().setSearchPolicy(SP_SEARCH_ALL);
 
-	GlobalConfig().setPpRemoveLines(false);
+    GlobalConfig().setPpRemoveLines(false);
 	QStringList words;
 	words << "movie info" << "synchro";
 	GlobalConfig().setPpRemoveWords(words);
