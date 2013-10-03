@@ -2,7 +2,7 @@ TEMPLATE = app
 
 DEFINES += VERSION=1.69
 
-QT += network xml widgets core
+QT += network xml widgets core  concurrent
 
 CONFIG += qt release c++11 warn_on
 
@@ -49,7 +49,6 @@ HEADERS += \
 app/qnapiconfig.h \
 app/movieinfo.h \
 app/qmultiparthttprequest.h \
-app/qnapithread.h \
 app/synchttp.h \
 app/qnapiabstractengine.h \
 app/qnapiprojektengine.h \
