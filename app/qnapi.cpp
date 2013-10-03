@@ -11,201 +11,184 @@
 ** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 **
 *****************************************************************************/
-
-
+#include <QMessageBox>
+#include <QStringList>
+#include <QPair>
+#include <QtConcurrent/QtConcurrent>
+#include <QProgressDialog>
 #include "qnapi.h"
+#include "forms/frmoptions.h"
+#include "qnapiconfig.h"
+#include "qnapisubtitleinfo.h"
+#include "qnapiabstractengine.h"
+#include "qnapiprojektengine.h"
+#include "qopensubtitlesengine.h"
+#include <functional>
+
+QNapiLanguage QNapi::m_lang;
+
+QPair<bool, QString> QNapi::bazinga(const QString& movie)
+{
+    bool success = true;
+
+    QNapiProjektEngine np(movie, m_lang);
+    success = np.process();
+
+    if(!success)
+    {
+        QOpenSubtitlesEngine os(movie, m_lang);
+        success = os.process();
+    }
+
+    return QPair<bool, QString>(success, movie);
+}
+
+
+QNapi::QNapi(int argc, char **argv)
+    : QApplication(argc, argv)
+{
+    QStringList args = arguments();
+    QString p;
+
+    for(int i=0; i < args.size(); ++i)
+    {
+        if(p.startsWith("file://"))
+            p = p.remove(0, 7);
+
+        if(QFileInfo(p).isDir())
+        {
+            m_movies << QDir(p).entryList(QStringList() << "*.mp4" << "*.avi" << "*.mkv" << "*.mpg" << "*.mov" << "*.vob");
+        }
+
+        if(QFileInfo(p).isFile())
+            m_movies << p;
+
+        if((p == "-l") || (p == "--language"))
+        {
+            ++i;
+            if(i < args.size())
+            {
+                m_lang.setLanguage(args[i]);//.toTwoLetter();
+            }
+        }
+
+    }
+
+
+    if(args.contains("-o") || args.contains("--options") || m_movies.isEmpty())
+    {
+        showSettings();
+        quit();
+    }
+    else
+    {
+        if(GlobalConfig().firstRun())
+        {
+            if(QMessageBox::question(0, QObject::tr("Pierwsze uruchomienie"),
+                    QObject::tr("To jest pierwsze uruchomienie programu QNapi. Czy chcesz go "
+                    "teraz skonfigurować?"), QMessageBox::Yes | QMessageBox::No )
+                == QMessageBox::Yes )
+            {
+                showSettings();
+                if(m_movies.isEmpty())
+                    quit();
+            }
+        }
+
+        if(!m_lang.isValid())
+        {
+            if(QMessageBox::question(0, "QNapi", QObject::tr("Niepoprawny kod językowy!\n"
+                    "Czy chcesz pobrać napisy w domyślnym języku?"), QMessageBox::Yes | QMessageBox::No)
+                != QMessageBox::Yes)
+            {
+                quit();
+            }
+        }
+    }
+
+    if(!checkAll())
+        quit();
+
+    if(!m_lang.isValid())
+        m_lang.setLanguage(GlobalConfig().language());
+
+    QProgressDialog dialog;
+    dialog.setLabelText(tr("Szukanie napisow dla %1 filmów. Prosze czekać...").arg(m_movies.size()));
+    dialog.setRange(0, m_movies.size());
+
+    // Create a QFutureWatcher and connect signals and slots.
+    QFutureWatcher<void> futureWatcher;
+    QObject::connect(&futureWatcher, SIGNAL(finished()), &dialog, SLOT(reset()));
+    QObject::connect(&dialog, SIGNAL(canceled()), &futureWatcher, SLOT(cancel()));
+    // QObject::connect(&futureWatcher, SIGNAL(progressRangeChanged(int,int)), &dialog, SLOT(setRange(int,int)));
+    QObject::connect(&futureWatcher, SIGNAL(progressValueChanged(int)), &dialog, SLOT(setValue(int)));
+
+    QFuture<QPair<bool, QString> > future(QtConcurrent::mapped(m_movies, bazinga));
+    futureWatcher.setFuture(future);
+
+    // Display the dialog and start the event loop.
+    dialog.exec();
+
+    future.waitForFinished();
+
+    QFutureIterator<QPair<bool, QString> > it(future);
+    while(it.hasNext())
+    {
+        QPair<bool, QString>  result = it.next();
+    }
+
+}
+
+void QNapi::showSettings()
+{
+    frmOptions f_options;
+    f_options.readConfig();
+
+    if(f_options.exec() == QDialog::Accepted)
+        f_options.writeConfig();
+}
 
 QNapi::~QNapi()
 {
-	cleanup();
 
-	foreach(QNapiAbstractEngine *e, enginesList)
-	{
-		if(e) delete e;
-	}
-}
-
-bool QNapi::checkP7ZipPath()
-{
-	return QFileInfo(GlobalConfig().p7zipPath()).isExecutable();
-}
-
-bool QNapi::checkTmpPath()
-{
-	QFileInfo f(GlobalConfig().tmpPath());
-	return f.isDir() && f.isWritable();
-}
-
-bool QNapi::ppEnabled()
-{
-    return GlobalConfig().ppEnabled();
 }
 
 bool QNapi::checkAll()
 {
-    if(!QNapi::checkP7ZipPath())
+    if(!QFileInfo(GlobalConfig().p7zipPath()).isExecutable())
     {
         QMessageBox::warning(0, tr("Brak programu p7zip!"),
                                 tr("Ścieżka do programu p7zip jest nieprawidłowa!"));
         return false;
     }
 
-    if(!QNapi::checkTmpPath())
+    QFileInfo f(GlobalConfig().tmpPath());
+
+    if(!(f.isDir() && f.isWritable()))
     {
         QMessageBox::warning(0, tr("Nieprawidłowy katalog tymczasowy!"),
                                 tr("Nie można pisać do katalogu tymczasowego! Sprawdź swoje ustawienia."));
         return false;
     }
 
-    if(getThread.queue.isEmpty())
+    bool flag = true;
+
+    foreach(QString movie, m_movies)
     {
-        QMessageBox::warning(0, tr("Brak plików!"),
-                                tr("Nie wskazano filmów do pobrania napisów!"));
-        return false;
+        flag = flag && QFileInfo(QFileInfo(movie).path()).isWritable();
+        QMessageBox::warning(0, tr("Nieprawidłowy katalog docelowy!"),
+                                tr("Nie można pisać do katalogu docelowego! Sprawdź swoje uprawnienia."));
     }
+
+    return flag;
 }
 
-QStringList QNapi::enumerateEngines()
+void QNapi::enqueue(const QString &movie)
 {
-	QStringList engines;
-	engines << "NapiProjekt";
-	engines << "OpenSubtitles";
-	return engines;
+    m_movies.append(movie);
 }
 
-bool QNapi::addEngine(QString engine)
+int QNapi::exec()
 {
-	if(engine == "NapiProjekt")
-	{
-		enginesList << (new QNapiProjektEngine());
-		return true;
-	}
-	else if(engine == "OpenSubtitles")
-	{
-		enginesList << (new QOpenSubtitlesEngine());
-		return true;
-	}
-	else
-	{
-		errorMsg = QString("Nieobsługiwany silnik pobierania: %1.").arg(engine);
-		return false;
-	}
+    return QApplication::exec();
 }
-
-bool QNapi::addEngines(QStringList engines)
-{
-	foreach(QString e, engines)
-	{
-		if(!addEngine(e))
-			return false;
-	}
-	return true;
-}
-
-void QNapi::setMoviePath(QString path)
-{
-	movie = path;
-	currentEngine = 0;
-}
-
-QString QNapi::moviePath()
-{
-	return movie;
-}
-
-bool QNapi::checkWritePermissions()
-{
-	return QFileInfo(QFileInfo(movie).path()).isWritable();
-}
-
-bool QNapi::lookForSubtitles(QString lang, QString engine)
-{
-	subtitlesList.clear();
-
-	bool result = false;
-
-
-	if(engine.isEmpty())
-	{
-		foreach(QNapiAbstractEngine *e, enginesList)
-		{
-			e->setMoviePath(movie);
-			result = e->lookForSubtitles(lang) || result;
-		}
-	}
-	else
-	{
-		QNapiAbstractEngine *e = engineByName(engine);
-		if(e)
-		{
-			e->setMoviePath(movie);
-			result = e->lookForSubtitles(lang);
-		}
-	}
-
-	if(!result)
-	{
-		errorMsg = "Nie znaleziono napisów!";
-	}
-
-	return result;
-}
-
-QList<QNapiSubtitleInfo> QNapi::listSubtitles()
-{
-	int curr_offset = 0;
-	subtitlesList.clear();
-
-	foreach(QNapiAbstractEngine *e, enginesList)
-	{
-		QList<QNapiSubtitleInfo> list =  e->listSubtitles();
-
-		offsetsList.insert(nameByEngine(e), curr_offset);
-		curr_offset += list.size();
-		subtitlesList << list;
-	}
-	return subtitlesList;
-}
-
-void QNapi::cleanup()
-{
-	foreach(QNapiAbstractEngine *e, enginesList)
-	{
-		e->cleanup();
-	}
-}
-
-QString QNapi::error()
-{
-	return errorMsg;
-}
-
-QNapiAbstractEngine * QNapi::engineByName(QString name)
-{
-	foreach(QNapiAbstractEngine *e, enginesList)
-	{
-		if(name == (e->engineName()))
-		{
-			return e;
-		}
-	}
-
-	return 0;
-}
-
-QString QNapi::nameByEngine(QNapiAbstractEngine * engine)
-{
-	return engine->engineName();
-}
-
-QStringList QNapi::listLoadedEngines()
-{
-	QStringList list;
-	foreach(QNapiAbstractEngine *e, enginesList)
-	{
-		list << e->engineName();
-	}
-	return list;
-}
-
-
