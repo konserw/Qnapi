@@ -11,62 +11,75 @@
 ** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 **
 *****************************************************************************/
-
+#include <QObject>
 #include "qnapilanguage.h"
 
-QNapiLanguage::QNapiLanguage(QString source) : QObject(0)
-{
-	fill_tables();
+const QStringList QNapiLanguage::codes2l = { "en",  "pl" };
+const QStringList QNapiLanguage::codes3l = { "eng", "pol"};
+const QStringList QNapiLanguage::names = {QObject::tr("Angielski"), QObject::tr("Polski")};
 
-	setLanguage(source);
+QNapiLanguage::QNapiLanguage()
+{
+    m_idx = -1;
+}
+
+QNapiLanguage::QNapiLanguage(QString source)
+{
+    setLanguage(source);
+}
+
+QNapiLanguage QNapiLanguage::operator=(const QNapiLanguage &other)
+{
+    m_idx = other.m_idx;
+    return *this;
 }
 
 void QNapiLanguage::setLanguage(QString source)
 {
-	idx = -1;
+    m_idx = -1;
 
 	if(source.length() == 2)
 	{
-		idx = codes2l.indexOf(source.toLower());
+        m_idx = codes2l.indexOf(source.toLower());
 	}
 	else if(source.length() == 3)
 	{
-		idx = codes3l.indexOf(source.toLower());
+        m_idx = codes3l.indexOf(source.toLower());
 	}
 	else
 	{
-		idx = names.indexOf(source);
+        m_idx = names.indexOf(source);
     }
 }
 
 bool QNapiLanguage::isValid() const
 {
-    return idx > -1;
+    return m_idx > -1;
 }
 
 QString QNapiLanguage::toTwoLetter() const
 {
-	if(idx > -1)
+    if(m_idx > -1)
 	{
-		return codes2l.at(idx);
+        return codes2l.at(m_idx);
 	}
 	return "";
 }
 
 QString QNapiLanguage::toTriLetter() const
 {
-	if(idx > -1)
+    if(m_idx > -1)
 	{
-		return codes3l.at(idx);
+        return codes3l.at(m_idx);
 	}
 	return "";
 }
 
 QString QNapiLanguage::toFullName() const
 {
-	if(idx > -1)
+    if(m_idx > -1)
 	{
-		return names.at(idx);
+        return names.at(m_idx);
 	}
 	return "";
 }
@@ -74,16 +87,4 @@ QString QNapiLanguage::toFullName() const
 QStringList QNapiLanguage::listLanguages() const
 {
 	return names;
-}
-
-void QNapiLanguage::fill_tables()
-{
-
-	codes2l << "en";
-	codes3l << "eng";
-	names << tr("Angielski");
-
-	codes2l << "pl";
-	codes3l << "pol";
-	names << tr("Polski");
 }

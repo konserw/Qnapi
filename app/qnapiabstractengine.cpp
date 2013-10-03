@@ -11,7 +11,6 @@
 ** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 **
 *****************************************************************************/
-
 #include "qnapiabstractengine.h"
 #include "qnapiconfig.h"
 #include "qnapisubtitleinfo.h"
@@ -19,10 +18,7 @@
 
 #include <QTextCodec>
 #include <QTextStream>
-
-//#include <QFlags>
-
-//#include <QFileInfo>
+#include <QProcess>
 
 const char* const QNapiAbstractEngine::m_convertScript = R"delim(
         import sys
@@ -46,32 +42,44 @@ bool QNapiAbstractEngine::process()
     {
         return false;
     }
-    if(!download())
+    bool f = false;
+    foreach(QNapiSubtitleInfo* i, m_infoList->children())
     {
-        return false;
-    }
-    if(!unpack())
-    {
-        return false;
-    }
-    if(!convert())
-    {
-        return false;
+        if(!download(*i))
+        {
+            continue;
+        }
+        if(!unpack(*i))
+        {
+            continue;
+        }
+        if(!convert(*i))
+        {
+            continue;
+        }
+        pp(*i);
+        f = true;
     }
 
-
-
-    return true;
+    return f;
 }
 
 QNapiAbstractEngine::~QNapiAbstractEngine()
 {
-    cleanup();
+    foreach(QNapiSubtitleInfo* i, m_infoList->children())
+    {
+        if(QFile::exists(i->tmpPackedFile()))
+            QFile::remove(i->tmpPackedFile());
+        if(QFile::exists(i->subtitlesTmp()))
+            QFile::remove(i->subtitlesTmp());
+        if(QFile::exists(i->scriptPath()))
+            QFile::remove(i->scriptPath());
+    }
 
     delete m_infoList;
 }
 
-bool QNapiAbstractEngine::convert(QNapiSubtitleInfo &info)
+bool QNapiAbstractEngine::convert(const QNapiSubtitleInfo &info)
 {
     if(!info.subtitlesTmpExist())
         return false;
@@ -131,12 +139,12 @@ void QNapiAbstractEngine::pp(const QNapiSubtitleInfo& info)
 // Usuwanie linii zawierajacych podane slowa z pliku z napisami
 bool QNapiAbstractEngine::removeLinesContainingWords(QStringList wordList, const QNapiSubtitleInfo& info)
 {
-    if(!info->subtitlesExist())
+    if(!info.subtitlesExist())
 		return false;
 
 	wordList = wordList.filter(QRegExp("^(.+)$"));
 
-	QFile f(subtitles);
+    QFile f(info.subtitlesPath());
 	if(!f.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
@@ -196,8 +204,8 @@ bool QNapiAbstractEngine::changeSubtitlesPermissions(QFile::Permissions permissi
     return QFile::setPermissions(info.subtitlesPath(), permissions);
 }
 
-QNapiAbstractEngine::QNapiAbstractEngine(const QString &movieFile, const QString &lang)
+QNapiAbstractEngine::QNapiAbstractEngine(const QString &movieFile, const QNapiLanguage &lang)
 {
-    m_infoList = new QNapiInfoList(movieFile, lang);
+    m_infoList = new QNapiSubtitleInfoList(movieFile, lang);
 }
 

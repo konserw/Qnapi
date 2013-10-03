@@ -18,8 +18,9 @@ const QString QOpenSubtitlesEngine::openSubtitlesXmlRpcHost  = "www.opensubtitle
 const QString QOpenSubtitlesEngine::openSubtitlesXmlRpcPath  = "/xml-rpc";
 const int QOpenSubtitlesEngine::openSubtitlesXmlRpcPort  = 80;
 
+
 // konstruktor klasy
-QOpenSubtitlesEngine::QOpenSubtitlesEngine(const QString & movieFile, const QString& lang)
+QOpenSubtitlesEngine::QOpenSubtitlesEngine(const QString & movieFile, const QNapiLanguage& lang)
     : QNapiAbstractEngine(movieFile, lang)
 {
 	rpc.setHost(openSubtitlesXmlRpcHost, openSubtitlesXmlRpcPort, openSubtitlesXmlRpcPath);
@@ -28,60 +29,8 @@ QOpenSubtitlesEngine::QOpenSubtitlesEngine(const QString & movieFile, const QStr
 // destruktor klasy
 QOpenSubtitlesEngine::~QOpenSubtitlesEngine()
 {
-	cleanup();
 	if(isLogged())
 		logout();
-}
-
-// zwraca nazwe modulu
-QString QOpenSubtitlesEngine::engineName()
-{
-	return "OpenSubtitles";
-}
-
-// zwraca informacje nt. modulu
-QString QOpenSubtitlesEngine::engineInfo()
-{
-	return "Modul pobierania napisów z bazy <b>www.opensubtitles.org</b><br />"
-			"Copyright (c) 2008-2009 by Krzemin";
-}
-
-// zwraca ikone w formacie XMP
-QIcon QOpenSubtitlesEngine::engineIcon()
-{
-	static const char *icon[]={
-		"16 16 14 1",
-		". c #000000",
-		"h c #111111",
-		"c c #222222",
-		"j c #333333",
-		"g c #444444",
-		"l c #555555",
-		"e c #777777",
-		"k c #888888",
-		"a c #999999",
-		"b c #aaaaaa",
-		"f c #cccccc",
-		"i c #dddddd",
-		"d c #eeeeee",
-		"# c #ffffff",
-		"................",
-		".##.##.##.##.##.",
-		".##.##.##.##.##.",
-		"................",
-		"................",
-		"...a##b..cd##d..",
-		"..ea..be.fg.hi..",
-		"..ic..hi.ig.....",
-		"..dh..hd.g##ij..",
-		"..ea..ak.k..gi..",
-		"...b##b..fd##l..",
-		"................",
-		"................",
-		".##.##.##.##.##.",
-		".##.##.##.##.##.",
-		"................"};
-    return QIcon(QPixmap(icon));
 }
 
 // oblicza sume kontrolna dla pliku filmowego

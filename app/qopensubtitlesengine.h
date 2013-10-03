@@ -28,24 +28,17 @@ class QOpenSubtitlesEngine : public QNapiAbstractEngine
 {
 public:
 
-    QOpenSubtitlesEngine(const QString & movieFile, const QString& lang);
+    QOpenSubtitlesEngine(const QString & movieFile, const QNapiLanguage& lang);
 	~QOpenSubtitlesEngine();
-
-	// zwraca nazwe modulu
-	QString engineName();
-	// zwraca informacje nt. modulu
-	QString engineInfo();
-	// zwraca ikone silnika pobierania
-	QIcon engineIcon();
 
 	// oblicza sume kontrolna pliku filmowego
     bool checksum();
 	// szuka napisow
     bool lookForSubtitles();
 	// probuje pobrac napisy
-    bool download();
+    bool download(const QNapiSubtitleInfo &info);
 	// probuje rozpakowac napisy
-	bool unpack();
+    bool unpack(const QNapiSubtitleInfo &info);
 
 private:
 	quint64 fileSize;

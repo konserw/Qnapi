@@ -1,6 +1,7 @@
 #ifndef QNAPISUBTITLEINFOLIST_H
 #define QNAPISUBTITLEINFOLIST_H
 
+#include "qnapilanguage.h"
 #include <QList>
 #include <QString>
 
@@ -9,7 +10,7 @@ class QNapiSubtitleInfo;
 class QNapiSubtitleInfoList
 {
 public:
-    QNapiSubtitleInfoList(const QString& moviePath, const QString& lang = QString());
+    QNapiSubtitleInfoList(const QString& moviePath, const QNapiLanguage &lang);
 
     bool hasChecksum() const;
     QString checkSum() const;
@@ -20,11 +21,12 @@ public:
     QString movieDir() const;
     QString moviePath() const;
 
-    QString lang() const;
-    void setLang(const QString &lang);
+    QNapiLanguage lang() const;
+    void setLang(const QNapiLanguage &lang);
 
     QString tmpPath() const;
 
+    QNapiSubtitleInfo* child() const;
     QList<QNapiSubtitleInfo *> children() const;
     void insertChild(QNapiSubtitleInfo* child);
 
@@ -36,7 +38,7 @@ protected:
     // suma kontrolna pliku filmowego
     QString m_checkSum;
     // jezyk napisow
-    QString m_lang;
+    QNapiLanguage m_lang;
 
     QList<QNapiSubtitleInfo*> m_children;
 };

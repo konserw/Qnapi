@@ -15,16 +15,15 @@
 #ifndef __QNAPILANGUAGE__H__
 #define __QNAPILANGUAGE__H__
 
-#include <QObject>
 #include <QString>
 #include <QStringList>
 
-class QNapiLanguage : public QObject
+class QNapiLanguage
 {
-Q_OBJECT
-
 public:
-	QNapiLanguage(QString source = "");
+    QNapiLanguage();
+    QNapiLanguage(QString source);
+    QNapiLanguage operator=(const QNapiLanguage& other);
 
 	void setLanguage(QString source);
     bool isValid() const;
@@ -36,11 +35,8 @@ public:
     QStringList listLanguages() const;
 
 private:
-	QStringList codes2l, codes3l, names;
-	int idx;
-
-	void fill_tables();
-
+    static const QStringList codes2l, codes3l, names;
+    int m_idx;
 };
 
 #endif

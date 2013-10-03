@@ -18,8 +18,8 @@
 #include <QString>
 #include <QStringList>
 #include <QFile>
+#include "qnapilanguage.h"
 
-class QIcon;
 class QNapiSubtitleInfo;
 class QNapiSubtitleInfoList;
 
@@ -31,38 +31,26 @@ public:
 
 	// destruktor
     virtual ~QNapiAbstractEngine();
-    // powinna czyscic pliki tymczasowe itd.
-    virtual void cleanup() = 0;
-
-
-	// powinna zwracac nazwe modulu
-	virtual QString engineName() = 0;
-	// powinna zwracac informacje nt. modulu (prawa autorskie itp.)
-	virtual QString engineInfo() = 0;
-	// zwraca ikone silnika pobierania
-	virtual QIcon engineIcon() = 0;
 
 	// powinna obliczac i zwracac sume kontrolna pliku filmowego, a takze ustawiac wartosc zmiennej checkSym
     virtual bool checksum() = 0;
 	// szuka napisow w podanym jezyku
     virtual bool lookForSubtitles() = 0;
 	// powinna pobierac napisy do filmu i zapisywac w jakims pliku tymczasowym
-    virtual bool download() = 0;
+    virtual bool download(const QNapiSubtitleInfo &info) = 0;
     // powinna rozpakowywac pobrane napisy
-	virtual bool unpack() = 0;
+    virtual bool unpack(const QNapiSubtitleInfo &info) = 0;
     // konwersja na srt
-    virtual bool convert() = 0;
-    bool convert(QNapiSubtitleInfo& info);
+    virtual bool convert(const QNapiSubtitleInfo &info);
     //post proces
     virtual void pp(const QNapiSubtitleInfo &info);
     // usuwa linie z pliku zawierajace conajmniej jedno z podanej listy slow
     bool removeLinesContainingWords(QStringList wordList, const QNapiSubtitleInfo &info);
-    // zmienia uprawnienia do pliku z napisami   
-    bool changeSubtitlesPermissions(QFile::Permissions permissions, QNapiSubtitleInfo info);
-
+    // zmienia uprawnienia do pliku z napisami      
+    bool changeSubtitlesPermissions(QFile::Permissions permissions, const QNapiSubtitleInfo &info);
 protected:
 	// konstruktor klasy
-    QNapiAbstractEngine(const QString & movieFile, const QString &lang = QString());
+    QNapiAbstractEngine(const QString & movieFile, const QNapiLanguage &lang);
 
     QNapiSubtitleInfoList* m_infoList;
 

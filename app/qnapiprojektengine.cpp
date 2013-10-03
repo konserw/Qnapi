@@ -16,7 +16,8 @@
 #include "qnapisubtitleinfo.h"
 #include "QNapiSubtitleInfoList.h"
 #include "movieinfo.h"
-#include "qnapilanguage.h"
+#include "qnapiconfig.h"
+#include "qmultiparthttprequest.h"
 
 #include <QUrl>
 #include <QMessageBox>
@@ -25,64 +26,21 @@
 #include <QFile>
 #include <QIcon>
 #include <QPixmap>
+#include <QProcess>
 
 const QString QNapiProjektEngine::m_napiDownloadUrlTpl= "http://www.napiprojekt.pl/unit_napisy/dl.php?l=%1&f=%2&t=%3&v=other&kolejka=false&nick=%4&pass=%5&napios=%6";
 const QString QNapiProjektEngine::m_napiZipPassword = "iBlm8NTigvru0Jr0";
 
 
 // konstruktor klasy
-QNapiProjektEngine::QNapiProjektEngine(const QString & movieFile, const QString &lang)
+QNapiProjektEngine::QNapiProjektEngine(const QString & movieFile, const QNapiLanguage &lang)
     : QNapiAbstractEngine(movieFile, lang)
 {
-
 }
 
 // destruktor klasy
 QNapiProjektEngine::~QNapiProjektEngine()
 {
-}
-
-
-// zwraca nazwe modulu
-QString QNapiProjektEngine::engineName()
-{
-	return "NapiProjekt";
-}
-
-// zwraca informacje nt. modulu
-QString QNapiProjektEngine::engineInfo()
-{
-	return "Modul pobierania napisów z bazy <b>www.napiprojekt.pl</b><br />"
-			"Copyright (c) 2008-2009 by Krzemin";
-}
-
-// zwraca ikone w formacie XMP
-QIcon QNapiProjektEngine::engineIcon()
-{
-	static const char * const icon[] = {
-		"16 16 5 1",
-		"   c #FFFFFF",
-		".  c #000080",
-		"+  c #0052CC",
-		"@  c #005CE6",
-		"#  c #BFD9FF",
-		"           ...  ",
-		"         ... .  ",
-		"       ... ...  ",
-		"     ... ....   ",
-		"   ... ....     ",
-		" ... ....       ",
-		".. ....         ",
-		"....+           ",
-		" ...............",
-		" . . . . . . . .",
-		" ...............",
-		" .@@####@####@@.",
-		" .@@#@@#@#@@#@@.",
-		" .@@#@@#@####@@.",
-		" .@@#@@#@#@@@@@.",
-		" ..............."};
-    return QIcon(QPixmap(icon));
 }
 
 // oblicza sume kontrolna dla pliku filmowego (md5 z pierwszych 10MB pliku)
@@ -137,21 +95,20 @@ bool QNapiProjektEngine::lookForSubtitles()
 
     QNapiSubtitleInfo* i = new QNapiSubtitleInfo(m_infoList);
     i->setUrl(urlTxt);
-
-
+    m_infoList->insertChild(i);
 
     return true;
 }
 
 // Probuje pobrac napisy do filmu z serwera NAPI
-bool QNapiProjektEngine::download()
+bool QNapiProjektEngine::download(const QNapiSubtitleInfo &info)
 {
     QByteArray buffer = http.readAll();
 
     if(buffer.indexOf("NPc") == 0)
         return false;
 
-    QFile file(tmpPackedFile);
+    QFile file(info.tmpPackedFile());
     if(file.exists()) file.remove();
     if(!file.open(QIODevice::WriteOnly))
         return false;
@@ -163,16 +120,16 @@ bool QNapiProjektEngine::download()
 }
 
 // Probuje rozpakowac napisy do filmu
-bool QNapiProjektEngine::unpack()
+bool QNapiProjektEngine::unpack(const QNapiSubtitleInfo &info)
 {
-    if(!QFile::exists(tmpPackedFile)) return false;
-    subtitlesTmp = ;
+    if(!QFile::exists(info.tmpPackedFile()))
+        return false;
 
-	if(QFile::exists(subtitlesTmp))
-		QFile::remove(subtitlesTmp);
+    if(QFile::exists(info.subtitlesTmp()))
+        QFile::remove(info.subtitlesTmp());
 
 	QStringList args;
-    args << "e" << "-y" << ("-p" + m_napiZipPassword) << ("-o" + tmpPath) << tmpPackedFile;
+    args << "e" << "-y" << ("-p" + m_napiZipPassword) << ("-o" + m_infoList->tmpPath()) << info.tmpPackedFile();
 
 	QProcess p7zip;
     p7zip.start(GlobalConfig().p7zipPath(), args);
@@ -180,18 +137,9 @@ bool QNapiProjektEngine::unpack()
 	// Rozpakowujemy napisy max w ciagu 5 sekund
 	if(!p7zip.waitForFinished(5000)) return false;
 
-    return QFile::exists(subtitlesTmp);
+    return QFile::exists(info.subtitlesTmp());
 }
 
-void QNapiProjektEngine::cleanup()
-{
-    if(QFile::exists(info.tmpPackedFile))
-        QFile::remove(tmpPackedFile);
-    if(QFile::exists(subtitlesTmp))
-        QFile::remove(subtitlesTmp);
-    if(QFile::exists(scriptPath))
-        QFile::remove(scriptPath);
-}
 // Tajemnicza funkcja f()
 QString QNapiProjektEngine::npFDigest(const QString & input)
 {
@@ -222,9 +170,9 @@ QString QNapiProjektEngine::npFDigest(const QString & input)
 	return b;
 }
 
-QString QNapiProjektEngine::npLangWrapper(QString lang)
+QString QNapiProjektEngine::npLangWrapper(QNapiLanguage l)
 {
-	lang = QNapiLanguage(lang).toTwoLetter().toUpper();
+    QString lang = l.toTwoLetter().toUpper();
 
 	if(lang == "EN")
 		lang = "ENG";

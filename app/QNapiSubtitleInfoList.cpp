@@ -5,15 +5,10 @@
 
 #include <QFileInfo>
 
-QNapiSubtitleInfoList::QNapiSubtitleInfoList(const QString &moviePath, const QString &lang)
-    : m_moviePath(moviePath)
+QNapiSubtitleInfoList::QNapiSubtitleInfoList(const QString &moviePath, const QNapiLanguage &lang)
+    : m_moviePath(moviePath), m_lang(lang)
 {
     m_tmpPath = GlobalConfig().tmpPath();
-
-    if(lang.isEmpty())
-        m_lang = GlobalConfig().language();
-    else
-        m_lang = lang;
 }
 
 
@@ -57,12 +52,12 @@ void QNapiSubtitleInfoList::setCheckSum(const QString &checkSum)
     m_checkSum = checkSum;
 }
 
-QString QNapiSubtitleInfoList::lang() const
+QNapiLanguage QNapiSubtitleInfoList::lang() const
 {
     return m_lang;
 }
 
-void QNapiSubtitleInfoList::setLang(const QString &lang)
+void QNapiSubtitleInfoList::setLang(const QNapiLanguage &lang)
 {
     m_lang = lang;
 }
@@ -70,6 +65,13 @@ void QNapiSubtitleInfoList::setLang(const QString &lang)
 QString QNapiSubtitleInfoList::tmpPath() const
 {
     return m_tmpPath;
+}
+
+QNapiSubtitleInfo *QNapiSubtitleInfoList::child() const
+{
+    if(m_children.size() != 1)
+        return nullptr;
+    return m_children[0];
 }
 
 QList<QNapiSubtitleInfo *> QNapiSubtitleInfoList::children() const

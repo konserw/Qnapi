@@ -15,39 +15,27 @@
 #ifndef __QNAPIPROJEKTENGINE__H__
 #define __QNAPIPROJEKTENGINE__H__
 
-
-
-
 #include "qnapiabstractengine.h"
-#include "qmultiparthttprequest.h"
+#include "qnapilanguage.h"
 #include "synchttp.h"
 
 class QNapiProjektEngine : public QNapiAbstractEngine
 {
 public:
 
-    QNapiProjektEngine(const QString & movieFile, const QString &lang = QString());
+    QNapiProjektEngine(const QString & movieFile, const QNapiLanguage &lang = QNapiLanguage());
 	~QNapiProjektEngine();
-
-	// zwraca nazwe modulu
-	QString engineName();
-	// zwraca informacje nt. modulu
-	QString engineInfo();
-	// zwraca ikone silnika pobierania
-    QIcon engineIcon();
 
     bool checksum();
     bool lookForSubtitles();
-    bool download();
-    bool unpack();
-
-    void cleanup();
+    bool download(const QNapiSubtitleInfo &info);
+    bool unpack(const QNapiSubtitleInfo &info);
 
 private:
     SyncHTTP http;
 
 	QString npFDigest(const QString & input);
-    QString npLangWrapper(QString m_lang);
+    QString npLangWrapper(QNapiLanguage l);
 
     static const QString m_napiDownloadUrlTpl;
     static const QString m_napiZipPassword;
