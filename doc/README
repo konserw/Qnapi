@@ -1,8 +1,8 @@
 QNapi
 =====
 
-Author:                Krzemin <pkrzemin@o2.pl>
-WWW home page:         http://krzemin.iglu.cz/qnapi
+Author:                konserw <konserw@gmail.com>
+WWW home page:         https://github.com/konserw/Qnapi
 
 This program is distributed under the terms of GNU General Pulic License;
 either version 2 or (at your opinion) any later version.
@@ -15,31 +15,18 @@ web services.
 
 Requirements
 ============
- * Qt version 4.3.0, or higher.
+ * Qt version 5.2, or higher.
  * p7zip. More info you can find at the website http://p7zip.sourceforge.net
-
+ * python 2.7
+ * aeidon
 
 Installation
 ===========
 
-First check if there's a package of QNapi for your distribution:
-http://krzemin.iglu.cz/qnapi
-
-If there's no package for your distro, you'll have to compile QNapi from
-source. To do this you'll need Qt4 libraries and 7z, which you can find in
-p7zip-full (see http://p7zip.sourceforge.net for more details).
-
-First off, fetch and unpack the tarball:
-
-$ tar -zxvf qnapi-XXX.tar.gz
-
-where XXX is a version of QNapi. Then enter the directory and build makefiles:
-
-$ cd qnapi-XXX
+$ cd qnapi
 $ qmake
 
-If you also have Qt3 installed, please type qmake-qt4 instead of qmake (which
-may be a symlink to qmake-qt3). Now build the program:
+Now build the program:
 
 $ make
 
@@ -57,6 +44,13 @@ QNapi's source directory:
 
 $ sudo make uninstall
 
+Bugs Reporting
+===============
+Any bugs found may be reported using github bugtracker:
+https://github.com/konserw/Qnapi/issues
+
+From original QNapi by Krzemin (may not match curnent version)
+==============================================================
 
 Compilation Errors
 ==================
@@ -145,13 +139,4 @@ On the "Appearance Conditions" tab you only have to check "Video Files".
 Then clink OK and it's done.
 
 
-Bugs Reporting
-===============
-Any bugs found may be reported using sourceforge bugtracker:
-http://sourceforge.net/tracker2/?atid=1043757&group_id=218384
 
-Contact
-=======
-
-If you want to send a package for your distro, or have any suggestions or
-notices, write me at pkrzemin@o2.pl

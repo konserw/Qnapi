@@ -28,7 +28,7 @@ bool QNapiSubtitleInfoList::hasChecksum() const
 QString QNapiSubtitleInfoList::movieName() const
 {    
     QFileInfo fi(m_moviePath);
-    return fi.baseName();
+    return fi.completeBaseName();
 }
 
 QString QNapiSubtitleInfoList::movieDir() const
