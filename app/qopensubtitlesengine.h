@@ -15,13 +15,8 @@
 #ifndef __QOPENSUBTITLESENGINE__H__
 #define __QOPENSUBTITLESENGINE__H__
 
-#include <QUrl>
-#include <QDir>
-#include <QMessageBox>
-
 #include "qnapiabstractengine.h"
 #include "xmlrpc/qsyncxmlrpcclient.h"
-#include "synchttp.h"
 #include "qnapilanguage.h"
 
 class QOpenSubtitlesEngine : public QNapiAbstractEngine
@@ -37,7 +32,7 @@ public:
     bool lookForSubtitles();
 	// probuje pobrac napisy
     bool download(const QNapiSubtitleInfo &info);
-	// probuje rozpakowac napisy
+    // probuje rozpakowac napisy
     bool unpack(const QNapiSubtitleInfo &info);
 
 private:
@@ -45,8 +40,6 @@ private:
 
 	QSyncXmlRpcClient rpc;
 	QString token;
-
-	QList<QNapiSubtitleInfo> subtitlesList;
 
 	// sprawdza czy dana instancja klasy jest zalogowana na sewerze
 	bool isLogged() { return !token.isEmpty(); }

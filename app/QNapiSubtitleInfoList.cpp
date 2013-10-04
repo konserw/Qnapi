@@ -79,8 +79,16 @@ QList<QNapiSubtitleInfo *> QNapiSubtitleInfoList::children() const
     return m_children;
 }
 
-void QNapiSubtitleInfoList::insertChild(QNapiSubtitleInfo *child)
+int QNapiSubtitleInfoList::childCount() const
 {
+    return m_children.size();
+}
+
+void QNapiSubtitleInfoList::addChild(const QString &url)
+{
+    QNapiSubtitleInfo* child = new QNapiSubtitleInfo(this);
+    child->setUrl(url);
+
     QString suffix;
     if(!m_children.isEmpty())
         suffix = QString("_%1").arg(QString::number(m_children.size()).rightJustified(2, '0'));

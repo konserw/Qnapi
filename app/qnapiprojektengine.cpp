@@ -93,9 +93,7 @@ bool QNapiProjektEngine::lookForSubtitles()
     if(!http.bytesAvailable())
         return false;
 
-    QNapiSubtitleInfo* i = new QNapiSubtitleInfo(m_infoList);
-    i->setUrl(urlTxt);
-    m_infoList->insertChild(i);
+    m_infoList->addChild(urlTxt);
 
     return true;
 }
@@ -128,14 +126,14 @@ bool QNapiProjektEngine::unpack(const QNapiSubtitleInfo &info)
     if(QFile::exists(info.subtitlesTmp()))
         QFile::remove(info.subtitlesTmp());
 
-	QStringList args;
+    QStringList args;
     args << "e" << "-y" << ("-p" + m_napiZipPassword) << ("-o" + m_infoList->tmpPath()) << info.tmpPackedFile();
 
-	QProcess p7zip;
+    QProcess p7zip;
     p7zip.start(GlobalConfig().p7zipPath(), args);
 
-	// Rozpakowujemy napisy max w ciagu 5 sekund
-	if(!p7zip.waitForFinished(5000)) return false;
+    // Rozpakowujemy napisy max w ciagu 5 sekund
+    if(!p7zip.waitForFinished(5000)) return false;
 
     return QFile::exists(info.subtitlesTmp());
 }

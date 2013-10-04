@@ -28,7 +28,9 @@ public:
 
     QNapiSubtitleInfo* child() const;
     QList<QNapiSubtitleInfo *> children() const;
-    void insertChild(QNapiSubtitleInfo* child);
+    int childCount() const;
+
+    void addChild(const QString& url);
 
 protected:
     // sciezka do pliku filmowego
