@@ -53,7 +53,6 @@ app/synchttp.h \
 app/qnapiabstractengine.h \
 app/qnapiprojektengine.h \
 #app/qnapicli.h \
-app/qcheckedlistwidget.h \
 app/qnapi.h \
 app/qnapisubtitleinfo.h \
 app/qopensubtitlesengine.h \
