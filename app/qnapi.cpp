@@ -24,7 +24,6 @@
 #include "qnapiprojektengine.h"
 #include "qopensubtitlesengine.h"
 #include "forms/frmsummary.h"
-#include <functional>
 
 QNapiLanguage QNapi::m_lang;
 
@@ -69,7 +68,7 @@ QNapi::QNapi(int argc, char **argv)
             ++i;
             if(i < args.size())
             {
-                m_lang.setLanguage(args[i]);//.toTwoLetter();
+                m_lang.setLanguage(args[i]);
             }
         }
 
@@ -121,7 +120,6 @@ QNapi::QNapi(int argc, char **argv)
     QFutureWatcher<void> futureWatcher;
     QObject::connect(&futureWatcher, SIGNAL(finished()), &dialog, SLOT(reset()));
     QObject::connect(&dialog, SIGNAL(canceled()), &futureWatcher, SLOT(cancel()));
-    // QObject::connect(&futureWatcher, SIGNAL(progressRangeChanged(int,int)), &dialog, SLOT(setRange(int,int)));
     QObject::connect(&futureWatcher, SIGNAL(progressValueChanged(int)), &dialog, SLOT(setValue(int)));
 
     QFuture<QPair<bool, QString> > future(QtConcurrent::mapped(m_movies, bazinga));
