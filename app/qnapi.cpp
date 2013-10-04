@@ -23,6 +23,7 @@
 #include "qnapiabstractengine.h"
 #include "qnapiprojektengine.h"
 #include "qopensubtitlesengine.h"
+#include "forms/frmsummary.h"
 #include <functional>
 
 QNapiLanguage QNapi::m_lang;
@@ -131,12 +132,24 @@ QNapi::QNapi(int argc, char **argv)
 
     future.waitForFinished();
 
+    QStringList win, fail;
+
     QFutureIterator<QPair<bool, QString> > it(future);
     while(it.hasNext())
     {
         QPair<bool, QString>  result = it.next();
+        if(result.first)
+            win.append(result.second);
+        else
+            fail.append(result.second);
     }
 
+    frmSummary sum;
+    sum.setSuccessList(win);
+    sum.setFailedList(fail);
+    sum.exec();
+
+    quit();
 }
 
 void QNapi::showSettings()
