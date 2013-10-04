@@ -47,107 +47,7 @@ QPair<bool, QString> QNapi::bazinga(const QString& movie)
 QNapi::QNapi(int argc, char **argv)
     : QApplication(argc, argv)
 {
-    QStringList args = arguments();
-    QString p;
 
-    for(int i=0; i < args.size(); ++i)
-    {
-        if(p.startsWith("file://"))
-            p = p.remove(0, 7);
-
-        if(QFileInfo(p).isDir())
-        {
-            m_movies << QDir(p).entryList(QStringList() << "*.mp4" << "*.avi" << "*.mkv" << "*.mpg" << "*.mov" << "*.vob");
-        }
-
-        if(QFileInfo(p).isFile())
-            m_movies << p;
-
-        if((p == "-l") || (p == "--language"))
-        {
-            ++i;
-            if(i < args.size())
-            {
-                m_lang.setLanguage(args[i]);
-            }
-        }
-
-    }
-
-
-    if(args.contains("-o") || args.contains("--options") || m_movies.isEmpty())
-    {
-        showSettings();
-        quit();
-    }
-    else
-    {
-        if(GlobalConfig().firstRun())
-        {
-            if(QMessageBox::question(0, QObject::tr("Pierwsze uruchomienie"),
-                    QObject::tr("To jest pierwsze uruchomienie programu QNapi. Czy chcesz go "
-                    "teraz skonfigurować?"), QMessageBox::Yes | QMessageBox::No )
-                == QMessageBox::Yes )
-            {
-                showSettings();
-                if(m_movies.isEmpty())
-                    quit();
-            }
-        }
-
-        if(!m_lang.isValid())
-        {
-            if(QMessageBox::question(0, "QNapi", QObject::tr("Niepoprawny kod językowy!\n"
-                    "Czy chcesz pobrać napisy w domyślnym języku?"), QMessageBox::Yes | QMessageBox::No)
-                != QMessageBox::Yes)
-            {
-                quit();
-            }
-        }
-    }
-
-    if(!checkAll())
-        quit();
-
-    if(!m_lang.isValid())
-        m_lang.setLanguage(GlobalConfig().language());
-
-    QProgressDialog dialog;
-    dialog.setLabelText(tr("Szukanie napisow dla %1 filmów. Prosze czekać...").arg(m_movies.size()));
-    dialog.setRange(0, m_movies.size());
-
-    // Create a QFutureWatcher and connect signals and slots.
-    QFutureWatcher<void> futureWatcher;
-    QObject::connect(&futureWatcher, SIGNAL(finished()), &dialog, SLOT(reset()));
-    QObject::connect(&dialog, SIGNAL(canceled()), &futureWatcher, SLOT(cancel()));
-    QObject::connect(&futureWatcher, SIGNAL(progressValueChanged(int)), &dialog, SLOT(setValue(int)));
-
-    QFuture<QPair<bool, QString> > future(QtConcurrent::mapped(m_movies, bazinga));
-    futureWatcher.setFuture(future);
-
-    // Display the dialog and start the event loop.
-    dialog.exec();
-
-    future.waitForFinished();
-
-    QStringList win, fail;
-
-    QFutureIterator<QPair<bool, QString> > it(future);
-    while(it.hasNext())
-    {
-        QPair<bool, QString>  result = it.next();
-        if(result.first)
-            win.append(result.second);
-        else
-            fail.append(result.second);
-    }
-
-    frmSummary sum;
-    sum.setSuccessList(win);
-    sum.setFailedList(fail);
-    sum.exec();
-
-    quit();
 }
 
 void QNapi::showSettings()
@@ -201,5 +101,103 @@ void QNapi::enqueue(const QString &movie)
 
 int QNapi::exec()
 {
-    return QApplication::exec();
+    QStringList args = arguments();
+    QString p;
+
+    for(int i=0; i < args.size(); ++i)
+    {
+        if(p.startsWith("file://"))
+            p = p.remove(0, 7);
+
+        if(QFileInfo(p).isDir())
+        {
+            m_movies << QDir(p).entryList(QStringList() << "*.mp4" << "*.avi" << "*.mkv" << "*.mpg" << "*.mov" << "*.vob");
+        }
+
+        if(QFileInfo(p).isFile())
+            m_movies << p;
+
+        if((p == "-l") || (p == "--language"))
+        {
+            ++i;
+            if(i < args.size())
+            {
+                m_lang.setLanguage(args[i]);
+            }
+        }
+
+    }
+
+
+    if(args.contains("-o") || args.contains("--options") || m_movies.isEmpty())
+    {
+        showSettings();
+        return 0;
+    }
+    else
+    {
+        if(GlobalConfig().firstRun())
+        {
+            if(QMessageBox::question(0, QObject::tr("Pierwsze uruchomienie"),
+                    QObject::tr("To jest pierwsze uruchomienie programu QNapi. Czy chcesz go "
+                    "teraz skonfigurować?"), QMessageBox::Yes | QMessageBox::No )
+                == QMessageBox::Yes )
+            {
+                showSettings();
+            }
+        }
+
+        if(!m_lang.isValid())
+        {
+            if(QMessageBox::question(0, "QNapi", QObject::tr("Niepoprawny kod językowy!\n"
+                    "Czy chcesz pobrać napisy w domyślnym języku?"), QMessageBox::Yes | QMessageBox::No)
+                != QMessageBox::Yes)
+            {
+                return 0;
+            }
+        }
+    }
+
+    if(!checkAll())
+        return 0;
+
+    if(!m_lang.isValid())
+        m_lang.setLanguage(GlobalConfig().language());
+
+    QProgressDialog dialog;
+    dialog.setLabelText(tr("Szukanie napisow dla %1 filmów. Prosze czekać...").arg(m_movies.size()));
+    dialog.setRange(0, m_movies.size());
+
+    // Create a QFutureWatcher and connect signals and slots.
+    QFutureWatcher<void> futureWatcher;
+    QObject::connect(&futureWatcher, SIGNAL(finished()), &dialog, SLOT(reset()));
+    QObject::connect(&dialog, SIGNAL(canceled()), &futureWatcher, SLOT(cancel()));
+    QObject::connect(&futureWatcher, SIGNAL(progressValueChanged(int)), &dialog, SLOT(setValue(int)));
+
+    QFuture<QPair<bool, QString> > future(QtConcurrent::mapped(m_movies, bazinga));
+    futureWatcher.setFuture(future);
+
+    // Display the dialog and start the event loop.
+    dialog.exec();
+
+    future.waitForFinished();
+
+    QStringList win, fail;
+
+    QFutureIterator<QPair<bool, QString> > it(future);
+    while(it.hasNext())
+    {
+        QPair<bool, QString>  result = it.next();
+        if(result.first)
+            win.append(result.second);
+        else
+            fail.append(result.second);
+    }
+
+    frmSummary sum;
+    sum.setSuccessList(win);
+    sum.setFailedList(fail);
+    sum.exec();
+
+    return 0;
 }
