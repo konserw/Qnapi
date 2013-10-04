@@ -4,7 +4,7 @@ DEFINES += VERSION=1.69
 
 QT += network xml widgets core  concurrent
 
-CONFIG += qt release c++11 warn_on
+CONFIG += qt c++11 warn_on #release
 
 #python
 INCLUDEPATH += /usr/include/python2.7

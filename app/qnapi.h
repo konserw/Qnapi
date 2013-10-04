@@ -27,7 +27,6 @@ class QNapi : public QApplication
 
         bool checkAll();
         int exec();
-        void showSettings();
         void enqueue(const QString &movie);
 
         static QPair<bool, QString> bazinga(const QString& movie);
@@ -35,8 +34,11 @@ class QNapi : public QApplication
         static QNapiLanguage lang()
         { return m_lang; }
 private:
+        bool m_showSettings;
+        bool m_run;
+
         // lista sciezek do filmow
-        QList<QString> m_movies;
+        QStringList m_movies;
         // jezyk napisow
         static QNapiLanguage m_lang;
 };

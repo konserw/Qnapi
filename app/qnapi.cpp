@@ -47,16 +47,64 @@ QPair<bool, QString> QNapi::bazinga(const QString& movie)
 QNapi::QNapi(int argc, char **argv)
     : QApplication(argc, argv)
 {
+    m_showSettings = false;
+    m_run = true;
 
-}
+    QStringList args;
+    for(int i=0; i<argc; ++i)
+    {
+        if(i==0)
+            continue;
+        args.append(QString(argv[i]));
+    }
 
-void QNapi::showSettings()
-{
-    frmOptions f_options;
-    f_options.readConfig();
+    QString p;
 
-    if(f_options.exec() == QDialog::Accepted)
-        f_options.writeConfig();
+    for(int i=0; i < args.size(); ++i)
+    {
+        p = args[i];
+        if(p.startsWith("file://"))
+            p = p.remove(0, 7);
+
+        QFileInfo fi(p);
+        if(fi.isDir())
+        {
+            m_movies << QDir(p).entryList(QStringList() << "*.mp4" << "*.avi" << "*.mkv" << "*.mpg" << "*.mov" << "*.vob");
+        }
+        else if(fi.isFile())
+            m_movies.append(p);
+
+        if((p == "-l") || (p == "--language"))
+        {
+            ++i;
+            if(i < args.size())
+                m_lang.setLanguage(args[i]);
+
+            if(!m_lang.isValid())
+                if(QMessageBox::question(0, "QNapi", QObject::tr("Niepoprawny kod językowy!\nCzy chcesz pobrać napisy w domyślnym języku?"), QMessageBox::Yes | QMessageBox::No)
+                    != QMessageBox::Yes)
+                    m_run = false;
+        }
+    }
+
+    if(args.contains("-o") || args.contains("--options") || m_movies.isEmpty())
+    {
+        m_showSettings = true;
+        m_run = false;
+    }
+    else
+    {
+        if(GlobalConfig().firstRun())
+        {
+            if(QMessageBox::question(0, QObject::tr("Pierwsze uruchomienie"),
+                    QObject::tr("To jest pierwsze uruchomienie programu QNapi. Czy chcesz go "
+                    "teraz skonfigurować?"), QMessageBox::Yes | QMessageBox::No )
+                == QMessageBox::Yes )
+            {
+                m_showSettings = true;
+            }
+        }
+    }
 }
 
 QNapi::~QNapi()
@@ -86,10 +134,12 @@ bool QNapi::checkAll()
 
     foreach(QString movie, m_movies)
     {
-        flag = flag && QFileInfo(QFileInfo(movie).path()).isWritable();
+        flag = flag && QFileInfo(QDir(movie).absolutePath()).isWritable();
+    }
+
+    if(!flag)
         QMessageBox::warning(0, tr("Nieprawidłowy katalog docelowy!"),
                                 tr("Nie można pisać do katalogu docelowego! Sprawdź swoje uprawnienia."));
-    }
 
     return flag;
 }
@@ -101,63 +151,17 @@ void QNapi::enqueue(const QString &movie)
 
 int QNapi::exec()
 {
-    QStringList args = arguments();
-    QString p;
-
-    for(int i=0; i < args.size(); ++i)
+    if(m_showSettings)
     {
-        if(p.startsWith("file://"))
-            p = p.remove(0, 7);
+        frmOptions f_options;
+        f_options.readConfig();
 
-        if(QFileInfo(p).isDir())
-        {
-            m_movies << QDir(p).entryList(QStringList() << "*.mp4" << "*.avi" << "*.mkv" << "*.mpg" << "*.mov" << "*.vob");
-        }
-
-        if(QFileInfo(p).isFile())
-            m_movies << p;
-
-        if((p == "-l") || (p == "--language"))
-        {
-            ++i;
-            if(i < args.size())
-            {
-                m_lang.setLanguage(args[i]);
-            }
-        }
-
+        if(f_options.exec() == QDialog::Accepted)
+            f_options.writeConfig();
     }
 
-
-    if(args.contains("-o") || args.contains("--options") || m_movies.isEmpty())
-    {
-        showSettings();
+    if(!m_run)
         return 0;
-    }
-    else
-    {
-        if(GlobalConfig().firstRun())
-        {
-            if(QMessageBox::question(0, QObject::tr("Pierwsze uruchomienie"),
-                    QObject::tr("To jest pierwsze uruchomienie programu QNapi. Czy chcesz go "
-                    "teraz skonfigurować?"), QMessageBox::Yes | QMessageBox::No )
-                == QMessageBox::Yes )
-            {
-                showSettings();
-            }
-        }
-
-        if(!m_lang.isValid())
-        {
-            if(QMessageBox::question(0, "QNapi", QObject::tr("Niepoprawny kod językowy!\n"
-                    "Czy chcesz pobrać napisy w domyślnym języku?"), QMessageBox::Yes | QMessageBox::No)
-                != QMessageBox::Yes)
-            {
-                return 0;
-            }
-        }
-    }
-
     if(!checkAll())
         return 0;
 
