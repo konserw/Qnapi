@@ -16,6 +16,7 @@
 #define __QNAPI__H__
 
 #include <QApplication>
+#include "QNapiResult.h"
 #include "qnapilanguage.h"
 
 // globalny menedzer pobierania napisow
@@ -29,7 +30,7 @@ class QNapi : public QApplication
         int exec();
         void enqueue(const QString &movie);
 
-        static QPair<bool, QString> bazinga(const QString& movie);
+        static QPair<QNapiResult, QString> bazinga(const QString& movie);
 
         static QNapiLanguage lang()
         { return m_lang; }

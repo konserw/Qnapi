@@ -23,43 +23,43 @@
 
 const char* const QNapiAbstractEngine::m_convertScript =
 R"delim(
-import sys
 import aeidon
 from aeidon import Project
-
 project = aeidon.Project()
 project.open_main("%1", "cp1250")
 project.set_framerate(aeidon.framerates.%3)
 project.save_main(aeidon.files.new(aeidon.formats.SUBRIP,"%2","utf_8"))
 )delim";
 
-bool QNapiAbstractEngine::process()
+QNapiResult QNapiAbstractEngine::process()
 {
     if(!checksum())
     {
-        return false;
+        return failedChechsum;
     }
     if(!lookForSubtitles())
     {
-        return false;
+        return failedLook;
     }
-    bool f = false;
+    QNapiResult f = failedDownload;
     foreach(QNapiSubtitleInfo* i, m_infoList->children())
     {
         if(!download(*i))
         {
             continue;
         }
+        f = failedUnpack;
         if(!unpack(*i))
         {
             continue;
         }
+        f = failedConvert;
         if(!convert(*i))
         {
             continue;
         }
+        f = success;
         pp(*i);
-        f = true;
     }
 
     return f;

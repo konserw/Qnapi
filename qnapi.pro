@@ -16,7 +16,8 @@ HEADERS += \
     qhttp/qhttp.h \
     qhttp/qringbuffer_p.h \
     qhttp/qhttpauthenticator_p.h \
-    app/QNapiSubtitleInfoList.h
+    app/QNapiSubtitleInfoList.h \
+    app/QNapiResult.h
 SOURCES += \
     qhttp/qhttp.cpp \
     qhttp/qhttpauthenticator.cpp \

@@ -19,6 +19,7 @@
 #include <QStringList>
 #include <QFile>
 #include "qnapilanguage.h"
+#include "QNapiResult.h"
 
 class QNapiSubtitleInfo;
 class QNapiSubtitleInfoList;
@@ -27,7 +28,7 @@ class QNapiAbstractEngine
 {
 public:
     //odwala cala czarna robote ;)
-    virtual bool process();
+    virtual QNapiResult process();
 
 	// destruktor
     virtual ~QNapiAbstractEngine();
