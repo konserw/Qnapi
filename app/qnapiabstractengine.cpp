@@ -15,22 +15,23 @@
 #include "qnapiconfig.h"
 #include "qnapisubtitleinfo.h"
 #include "QNapiSubtitleInfoList.h"
-
+#include <QApplication>
+#include <Python.h>
 #include <QTextCodec>
 #include <QTextStream>
 #include <QProcess>
 
-const char* const QNapiAbstractEngine::m_convertScript = R"delim(
-        import sys
-        import aeidon
-        from aeidon import Project
+const char* const QNapiAbstractEngine::m_convertScript =
+R"delim(
+import sys
+import aeidon
+from aeidon import Project
 
-        project = aeidon.Project()
-        project.open_main("%1", "cp1250")
-        project.set_framerate(aeidon.framerates.%3)
-        project.save_main(aeidon.files.new(aeidon.formats.SUBRIP,"%2","utf_8"))
-        sys.exit(0)
-        )delim";
+project = aeidon.Project()
+project.open_main("%1", "cp1250")
+project.set_framerate(aeidon.framerates.%3)
+project.save_main(aeidon.files.new(aeidon.formats.SUBRIP,"%2","utf_8"))
+)delim";
 
 bool QNapiAbstractEngine::process()
 {
@@ -72,8 +73,10 @@ QNapiAbstractEngine::~QNapiAbstractEngine()
             QFile::remove(i->tmpPackedFile());
         if(QFile::exists(i->subtitlesTmp()))
             QFile::remove(i->subtitlesTmp());
+#ifdef NOT_EMBED_PYTHON
         if(QFile::exists(i->scriptPath()))
             QFile::remove(i->scriptPath());
+#endif
     }
 
     delete m_infoList;
@@ -85,15 +88,14 @@ bool QNapiAbstractEngine::convert(const QNapiSubtitleInfo &info)
         return false;
 
     QString framerate;
-    double fps = info.parent()->movieFPS();
+    double fps = info.movieFPS();
     if(fps < 24) framerate = "FPS_23_976";
     else if(fps < 24.5) framerate = "FPS_24_000";
     else if(fps < 27) framerate = "FPS_25_000";
     else framerate = "FPS_29_970";
 
     QString program = QString(m_convertScript).arg(info.subtitlesTmp()).arg(info.subtitlesPath()).arg(framerate);
-
-//    scriptPath = qApp->applicationDirPath() + "/convert_ " + mf.completeBaseName() + ".py";
+#ifdef NOT_EMBED_PYTHON
     QFile ff(info.scriptPath());
     if(!ff.open(QFile::WriteOnly | QFile::Truncate))
     {
@@ -102,13 +104,18 @@ bool QNapiAbstractEngine::convert(const QNapiSubtitleInfo &info)
     QTextStream out(&ff);
     out << program;
     ff.close();
-//embed?
+
     QProcess process;
     process.start("python", QStringList() << info.scriptPath());
     if(!process.waitForFinished(5000))
         return false;
-
-    return (process.exitCode() == 0);
+#else
+    Py_SetProgramName(const_cast<char*>(qApp->applicationFilePath().toStdString().c_str()));  /* optional but recommended */
+    Py_Initialize();
+    PyRun_SimpleString(program.toStdString().c_str());
+    Py_Finalize();
+#endif
+    return QFile::exists(info.subtitlesPath());
 }
 
 void QNapiAbstractEngine::pp(const QNapiSubtitleInfo& info)

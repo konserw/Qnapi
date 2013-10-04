@@ -17,7 +17,6 @@
 
 #include "qnapiabstractengine.h"
 #include "qnapilanguage.h"
-#include "synchttp.h"
 
 class QNapiProjektEngine : public QNapiAbstractEngine
 {
@@ -32,7 +31,7 @@ public:
     bool unpack(const QNapiSubtitleInfo &info);
 
 private:
-    SyncHTTP http;
+
 
 	QString npFDigest(const QString & input);
     QString npLangWrapper(QNapiLanguage l);

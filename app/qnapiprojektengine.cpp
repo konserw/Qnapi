@@ -18,7 +18,7 @@
 #include "movieinfo.h"
 #include "qnapiconfig.h"
 #include "qmultiparthttprequest.h"
-
+#include "synchttp.h"
 #include <QUrl>
 #include <QMessageBox>
 #include <QCryptographicHash>
@@ -86,7 +86,7 @@ bool QNapiProjektEngine::lookForSubtitles()
             .arg("Linux/UNIX");
 
 	QUrl url(urlTxt);
-
+    SyncHTTP http;
 	http.setHost(url.host());
     http.syncGet(url.path() + "?" + url.query(QUrl::EncodeDelimiters | QUrl::EncodeReserved | QUrl::EncodeSpaces | QUrl::EncodeUnicode));
 
@@ -101,6 +101,14 @@ bool QNapiProjektEngine::lookForSubtitles()
 // Probuje pobrac napisy do filmu z serwera NAPI
 bool QNapiProjektEngine::download(const QNapiSubtitleInfo &info)
 {
+    QUrl url(info.url());
+    SyncHTTP http;
+    http.setHost(url.host());
+    http.syncGet(url.path() + "?" + url.query(QUrl::EncodeDelimiters | QUrl::EncodeReserved | QUrl::EncodeSpaces | QUrl::EncodeUnicode));
+
+    if(!http.bytesAvailable())
+        return false;
+
     QByteArray buffer = http.readAll();
 
     if(buffer.indexOf("NPc") == 0)
@@ -114,7 +122,7 @@ bool QNapiProjektEngine::download(const QNapiSubtitleInfo &info)
     int r = file.write(buffer);
     file.close();
 
-    return (bool)!r;
+    return (r > 0);
 }
 
 // Probuje rozpakowac napisy do filmu

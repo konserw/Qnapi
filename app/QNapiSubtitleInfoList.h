@@ -21,6 +21,13 @@ public:
     QString movieDir() const;
     QString moviePath() const;
 
+    bool subtitlesTmpExist() const;
+    QString subtitlesTmp() const;
+    void setSubtitlesTmp(const QString &subtitlesTmp);
+#ifdef NOT_EMBED_PYTHON
+    QString scriptPath() const;
+    void setScriptPath(const QString &scriptPath);
+#endif
     QNapiLanguage lang() const;
     void setLang(const QNapiLanguage &lang);
 
@@ -33,6 +40,12 @@ public:
     void addChild(const QString& url);
 
 protected:
+#ifdef NOT_EMBED_PYTHON
+    // sciezka do pliku skryptu konwertujacego
+    QString m_scriptPath;
+#endif
+    // sciezka do tymczasowego pliku z napisami
+    QString m_subtitlesTmp;
     // sciezka do pliku filmowego
     QString m_moviePath;
     // sciezka do katalogu tymczasowego

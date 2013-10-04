@@ -1,6 +1,4 @@
 #include "qnapisubtitleinfo.h"
-#include "QNapiSubtitleInfoList.h"
-
 #include <QFile>
 
 bool QNapiSubtitleInfo::m_initialized = false;
@@ -32,21 +30,6 @@ void QNapiSubtitleInfo::setSubtitlesPath(const QString &subtitlesPath)
     m_subtitlesPath = subtitlesPath;
 }
 
-bool QNapiSubtitleInfo::subtitlesTmpExist() const
-{
-    return QFile::exists(m_subtitlesTmp);
-}
-
-QString QNapiSubtitleInfo::subtitlesTmp() const
-{
-    return m_subtitlesTmp;
-}
-
-void QNapiSubtitleInfo::setSubtitlesTmp(const QString &subtitlesTmp)
-{
-    m_subtitlesTmp = subtitlesTmp;
-}
-
 QString QNapiSubtitleInfo::tmpPackedFile() const
 {
     return m_tmpPackedFile;
@@ -55,20 +38,6 @@ QString QNapiSubtitleInfo::tmpPackedFile() const
 void QNapiSubtitleInfo::setTmpPackedFile(const QString &tmpPackedFile)
 {
     m_tmpPackedFile = tmpPackedFile;
-}
-
-QString QNapiSubtitleInfo::scriptPath() const
-{
-    return m_scriptPath;
-}
-
-void QNapiSubtitleInfo::setScriptPath(const QString &scriptPath)
-{
-    m_scriptPath = scriptPath;
-}
-QNapiSubtitleInfoList *QNapiSubtitleInfo::parent() const
-{
-    return m_parent;
 }
 
 QString QNapiSubtitleInfo::url() const
@@ -80,5 +49,3 @@ void QNapiSubtitleInfo::setUrl(const QString &url)
 {
     m_url = url;
 }
-
-

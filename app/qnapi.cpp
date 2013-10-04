@@ -29,7 +29,7 @@ QNapiLanguage QNapi::m_lang;
 
 QPair<bool, QString> QNapi::bazinga(const QString& movie)
 {
-    bool success = true;
+    bool success;
 
     QNapiProjektEngine np(movie, m_lang);
     success = np.process();
