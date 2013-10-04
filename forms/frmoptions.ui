@@ -14,8 +14,8 @@
    <string>QNapi - opcje programu</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>:/icon/qnapi-48-icon.png</normaloff>:/icon/qnapi-48-icon.png</iconset>
+   <iconset resource="../resources.qrc">
+    <normaloff>:/icon/qnapi-48-icon</normaloff>:/icon/qnapi-48-icon</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

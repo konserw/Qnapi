@@ -17,8 +17,8 @@
    <string>QNapi - rezultat dopasowania napisów</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>:/icon/qnapi-48-icon.png</normaloff>:/icon/qnapi-48-icon.png</iconset>
+   <iconset resource="../resources.qrc">
+    <normaloff>:/icon/qnapi-48-icon</normaloff>:/icon/qnapi-48-icon</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -149,7 +149,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>pbOK</sender>
