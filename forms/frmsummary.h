@@ -22,17 +22,18 @@
 
 #include "qnapiconfig.h"
 #include "ui_frmsummary.h"
+#include "QNapiResult.h"
 
 class frmSummary: public QDialog
 {
 Q_OBJECT
 
 	public:
-        frmSummary(QWidget *parent = 0, Qt::WindowFlags f = 0);
+        frmSummary(QWidget *parent = 0);
         ~frmSummary(){}
 
-		void setSuccessList(const QStringList & list);
-		void setFailedList(const QStringList & list);
+        void addResult(const QNapiComplexResult& res);
+        int exec();
 
 	private:
 		Ui::frmSummary ui;

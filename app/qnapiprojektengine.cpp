@@ -90,7 +90,7 @@ bool QNapiProjektEngine::lookForSubtitles()
 	http.setHost(url.host());
     http.syncGet(url.path() + "?" + url.query(QUrl::EncodeDelimiters | QUrl::EncodeReserved | QUrl::EncodeSpaces | QUrl::EncodeUnicode));
 
-    if(!http.bytesAvailable())
+    if(http.bytesAvailable() == 0)
         return false;
 
     m_infoList->addChild(urlTxt);

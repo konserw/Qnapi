@@ -14,35 +14,39 @@
 
 #include "frmsummary.h"
 
-frmSummary::frmSummary(QWidget * parent, Qt::WindowFlags f) : QDialog(parent, f)
+frmSummary::frmSummary(QWidget * parent) : QDialog(parent)
 {
 	ui.setupUi(this);
 
-	setAttribute(Qt::WA_QuitOnClose, false);
-
 	// workaround dla compiza?
 	move((QApplication::desktop()->width() - width()) / 2, 
-		(QApplication::desktop()->height() - height()) / 2);
+         (QApplication::desktop()->height() - height()) / 2);
 }
 
-void frmSummary::setSuccessList(const QStringList & list)
+void frmSummary::addResult(const QNapiComplexResult &res)
 {
-	ui.lwSuccess->clear();
-	foreach(QString item, list)
-	{
-		ui.lwSuccess->addItem(new QListWidgetItem(QIcon(":/ui/accept.png"),
-												QFileInfo(item).fileName()));
-	}
-	ui.lwSuccess->sortItems();
+    int  row = ui.tableWidget->rowCount();
+    ui.tableWidget->insertRow(row);
+
+    QIcon ico;
+    if(res.succeded())
+        ico = QIcon(":/ui/accept");
+    else
+        ico = QIcon(":/ui/exclamation");
+
+    QTableWidgetItem* it = new QTableWidgetItem(ico, res.movie());
+    ui.tableWidget->setItem(row, 0, it);
+
+    it = new QTableWidgetItem(res.npRes());
+    ui.tableWidget->setItem(row, 1, it);
+
+    it = new QTableWidgetItem(res.osRes());
+    ui.tableWidget->setItem(row, 2, it);
 }
 
-void frmSummary::setFailedList(const QStringList & list)
+int frmSummary::exec()
 {
-	ui.lwFail->clear();
-	foreach(QString item, list)
-	{
-		ui.lwFail->addItem(new QListWidgetItem(QIcon(":/ui/exclamation.png"),
-												QFileInfo(item).fileName()));
-	}
-	ui.lwFail->sortItems();
+    ui.tableWidget->resizeColumnsToContents();
+    ui.tableWidget->sortByColumn(0);
+    return QDialog::exec();
 }

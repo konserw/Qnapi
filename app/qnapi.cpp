@@ -13,7 +13,6 @@
 *****************************************************************************/
 #include <QMessageBox>
 #include <QStringList>
-#include <QPair>
 #include <QtConcurrent/QtConcurrent>
 #include <QProgressDialog>
 #include <QtDebug>
@@ -26,26 +25,25 @@
 #include "qopensubtitlesengine.h"
 #include "forms/frmsummary.h"
 
-
 QNapiLanguage QNapi::m_lang;
 
-QPair<QNapiResult, QString> QNapi::bazinga(const QString& movie)
+QNapiComplexResult QNapi::bazinga(const QString& movie)
 {
-    QNapiResult f = failed;
+    QNapiComplexResult res(movie);
 
     QNapiProjektEngine np(movie, m_lang);
-    f = np.process();
+    res.setNp(np.process());
 
-    qDebug() << movie << "\t|NapiProjekt:\t" << f;
+    //qDebug() << movie << "\t|NapiProjekt:\t" << f;
 
-    if(f != success)
+    if(res.np() != success)
     {
         QOpenSubtitlesEngine os(movie, m_lang);
-        f = os.process();
-        qDebug() << movie << "\t|OpenSubs:\t" << f;
+        res.setOs(os.process());
+   //     qDebug() << movie << "\t|OpenSubs:\t" << f;
     }
 
-    return QPair<QNapiResult, QString>(f, movie);
+    return res;
 }
 
 
@@ -154,24 +152,6 @@ void QNapi::enqueue(const QString &movie)
     m_movies.append(movie);
 }
 
-QString parseResult(const QNapiResult& res)
-{
-    switch(res)
-    {
-    case failedChechsum:
-        return QObject::tr("Failed to calculate checksum");
-    case failedLook:
-        return QObject::tr("Unable to find subtitles");
-    case failedDownload:
-        return QObject::tr("Failed to download subtitles");
-    case failedUnpack:
-        return QObject::tr("Failed to unpack downloaded subtitles");
-    case failedConvert:
-        return QObject::tr("Failed to execute txt->srt conversion script");
-    }
-    return QString();
-}
-
 int QNapi::exec()
 {
     if(m_showSettings)
@@ -201,29 +181,22 @@ int QNapi::exec()
     QObject::connect(&dialog, SIGNAL(canceled()), &futureWatcher, SLOT(cancel()));
     QObject::connect(&futureWatcher, SIGNAL(progressValueChanged(int)), &dialog, SLOT(setValue(int)));
 
-    QFuture<QPair<QNapiResult, QString> > future(QtConcurrent::mapped(m_movies, bazinga));
+    QFuture<QNapiComplexResult> future(QtConcurrent::mapped(m_movies, bazinga));
     futureWatcher.setFuture(future);
 
     // Display the dialog and start the event loop.
     dialog.exec();
-
     future.waitForFinished();
 
-    QStringList win, fail;
+    frmSummary sum;
 
-    QFutureIterator<QPair<QNapiResult, QString> > it(future);
+    QFutureIterator<QNapiComplexResult> it(future);
     while(it.hasNext())
     {
-        QPair<QNapiResult, QString>  result = it.next();
-        if(result.first == success)
-            win.append(result.second);
-        else
-            fail.append(QString("%1\t%2").arg(result.second, parseResult(result.first)));
+        QNapiComplexResult result = it.next();
+        sum.addResult(result);
     }
 
-    frmSummary sum;
-    sum.setSuccessList(win);
-    sum.setFailedList(fail);
     sum.exec();
 
     return 0;

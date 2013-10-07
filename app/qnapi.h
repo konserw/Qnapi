@@ -30,7 +30,7 @@ class QNapi : public QApplication
         int exec();
         void enqueue(const QString &movie);
 
-        static QPair<QNapiResult, QString> bazinga(const QString& movie);
+        static QNapiComplexResult bazinga(const QString& movie);
 
         static QNapiLanguage lang()
         { return m_lang; }

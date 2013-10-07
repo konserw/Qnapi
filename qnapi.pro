@@ -22,7 +22,8 @@ SOURCES += \
     qhttp/qhttp.cpp \
     qhttp/qhttpauthenticator.cpp \
     app/qnapisubtitleinfo.cpp \
-    app/QNapiSubtitleInfoList.cpp
+    app/QNapiSubtitleInfoList.cpp \
+    app/QNapiResult.cpp
 
 #qnapi
 INCLUDEPATH += app
