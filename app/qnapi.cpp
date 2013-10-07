@@ -15,7 +15,7 @@
 #include <QStringList>
 #include <QtConcurrent/QtConcurrent>
 #include <QProgressDialog>
-#include <QtDebug>
+//#include <QtDebug>
 #include "qnapi.h"
 #include "forms/frmoptions.h"
 #include "qnapiconfig.h"
@@ -176,8 +176,8 @@ int QNapi::exec()
     dialog.setRange(0, m_movies.size());
 
     // Create a QFutureWatcher and connect signals and slots.
-    QFutureWatcher<void> futureWatcher;
-    QObject::connect(&futureWatcher, SIGNAL(finished()), &dialog, SLOT(reset()));
+    QFutureWatcher<QNapiComplexResult> futureWatcher;
+  //  QObject::connect(&futureWatcher, SIGNAL(finished()), &dialog, SLOT(close()));
     QObject::connect(&dialog, SIGNAL(canceled()), &futureWatcher, SLOT(cancel()));
     QObject::connect(&futureWatcher, SIGNAL(progressValueChanged(int)), &dialog, SLOT(setValue(int)));
 
@@ -193,8 +193,7 @@ int QNapi::exec()
     QFutureIterator<QNapiComplexResult> it(future);
     while(it.hasNext())
     {
-        QNapiComplexResult result = it.next();
-        sum.addResult(result);
+        sum.addResult(it.next());
     }
 
     sum.exec();

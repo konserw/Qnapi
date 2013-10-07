@@ -22,10 +22,7 @@
 #include <QUrl>
 #include <QMessageBox>
 #include <QCryptographicHash>
-#include <cmath>
 #include <QFile>
-#include <QIcon>
-#include <QPixmap>
 #include <QProcess>
 
 const QString QNapiProjektEngine::m_napiDownloadUrlTpl= "http://www.napiprojekt.pl/unit_napisy/dl.php?l=%1&f=%2&t=%3&v=other&kolejka=false&nick=%4&pass=%5&napios=%6";

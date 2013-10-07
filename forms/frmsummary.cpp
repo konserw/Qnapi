@@ -11,20 +11,17 @@
 ** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 **
 *****************************************************************************/
-
+#include <QMutexLocker>
 #include "frmsummary.h"
 
 frmSummary::frmSummary(QWidget * parent) : QDialog(parent)
 {
-	ui.setupUi(this);
-
-	// workaround dla compiza?
-	move((QApplication::desktop()->width() - width()) / 2, 
-         (QApplication::desktop()->height() - height()) / 2);
+    ui.setupUi(this);
 }
 
 void frmSummary::addResult(const QNapiComplexResult &res)
 {
+    QMutexLocker lock(&m_mutex);
     int  row = ui.tableWidget->rowCount();
     ui.tableWidget->insertRow(row);
 

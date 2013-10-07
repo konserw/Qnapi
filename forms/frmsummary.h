@@ -16,11 +16,7 @@
 #define __FRMSUMMARY__H__
 
 #include <QDialog>
-#include <QDesktopWidget>
-#include <QListWidget>
-#include <QFileInfo>
-
-#include "qnapiconfig.h"
+#include <QMutex>
 #include "ui_frmsummary.h"
 #include "QNapiResult.h"
 
@@ -37,6 +33,7 @@ Q_OBJECT
 
 	private:
 		Ui::frmSummary ui;
+        QMutex m_mutex;
 };
 
 #endif
