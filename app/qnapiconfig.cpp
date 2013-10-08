@@ -13,8 +13,8 @@
 *****************************************************************************/
 #include <QFileInfo>
 #include <QApplication>
-#include <QDir>
 #include <QProcess>
+#include <QDir>
 #include <QRegExp>
 #include "qnapiconfig.h"
 

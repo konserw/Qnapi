@@ -51,7 +51,7 @@ void QNapiSubtitleInfoList::setCheckSum(const QString &checkSum)
 {
     m_checkSum = checkSum;
     m_subtitlesTmp = QString("%1/%2.txt").arg(m_tmpPath, m_checkSum);
-#ifdef NOT_EMBED_PYTHON
+#ifndef EMBED_PYTHON
     m_scriptPath = QString("%1/%2.py").arg(m_tmpPath, m_checkSum);
 #endif
 }
@@ -117,7 +117,7 @@ void QNapiSubtitleInfoList::setSubtitlesTmp(const QString &subtitlesTmp)
     m_subtitlesTmp = subtitlesTmp;
 }
 
-#ifdef NOT_EMBED_PYTHON
+#ifndef EMBED_PYTHON
 QString QNapiSubtitleInfoList::scriptPath() const
 {
     return m_scriptPath;

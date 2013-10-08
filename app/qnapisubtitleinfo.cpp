@@ -1,18 +1,11 @@
 #include "qnapisubtitleinfo.h"
 #include <QFile>
-
-bool QNapiSubtitleInfo::m_initialized = false;
+#include <QThread>
 
 QNapiSubtitleInfo::QNapiSubtitleInfo(QNapiSubtitleInfoList *parent)
     : m_parent(parent)
 {
-    if(!m_initialized)
-    {
-        qsrand(time(0));
-        m_initialized = true;
-    }
-
-    m_tmpPackedFile =  QString("%1/QNapi.%2.tmp").arg(m_parent->tmpPath()).arg(qrand());
+    m_tmpPackedFile =  QString("%1/QNapi.%3.tmp").arg(m_parent->tmpPath()).arg((long)QThread::currentThread());
 }
 
 bool QNapiSubtitleInfo::subtitlesExist() const

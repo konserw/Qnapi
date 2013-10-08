@@ -56,7 +56,7 @@ public:
     { return m_parent->subtitlesTmpExist(); }
     QString subtitlesTmp() const
     { return m_parent->subtitlesTmp(); }
-#ifdef NOT_EMBED_PYTHON
+#ifndef EMBED_PYTHON
     QString scriptPath() const
     { return m_parent->scriptPath(); }
 #endif
@@ -68,7 +68,6 @@ protected:
     // sciezka do spakowanego pliku napisow
     QString m_tmpPackedFile;
 
-    static bool m_initialized;
     QNapiSubtitleInfoList* m_parent;
 };
 

@@ -18,6 +18,9 @@
 #include <QString>
 #include <QStringList>
 #include <QFile>
+#ifdef EMBED_PYTHON
+#include <QMutex>
+#endif
 #include "qnapilanguage.h"
 #include "QNapiResult.h"
 
@@ -56,6 +59,11 @@ protected:
     QNapiSubtitleInfoList* m_infoList;
 
     static const char* const m_convertScript;
+
+#ifdef EMBED_PYTHON
+    static const char* m_appPath;
+    QMutex m_mutex;
+#endif
 };
 
 #endif

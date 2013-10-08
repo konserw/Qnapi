@@ -1,15 +1,19 @@
 TEMPLATE = app
 
 DEFINES += VERSION=1.7
+#DEFINES += EMBED_PYTHON
 
-QT += network xml widgets core  concurrent
+QT += network xml widgets core concurrent
 
-CONFIG += qt c++11 release #warn_on
+CONFIG += qt c++11 warn_on #release
+
+#QMAKE_CXXFLAGS += -mno-sse
 
 #python
-INCLUDEPATH += /usr/include/python2.7
-LIBS += -lpthread -ldl -lutil -lm -lpython2.7
-
+#contains(DEFINES, EMBED_PYTHON){
+#    INCLUDEPATH += /usr/include/python2.7
+#    LIBS += -lpthread -ldl -lutil -lm -lpython2.7
+#}
 #qt http
 INCLUDEPATH += qhttp
 HEADERS += \

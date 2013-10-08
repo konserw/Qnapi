@@ -49,9 +49,11 @@ bool QOpenSubtitlesEngine::checksum()
 	quint64 hash = fileSize;
 	quint64 tmp, i;
 
-	for(tmp = 0, i = 0; i < 65536/sizeof(tmp) && file.read((char*)&tmp, sizeof(tmp)); i++, hash += tmp) ;
+    for(tmp = 0, i = 0; i < 65536/sizeof(tmp) && file.read((char*)&tmp, sizeof(tmp)); i++, hash += tmp)
+        ;
 	file.seek(qMax(0, (int)((qint64)fileSize - 65536)));
-	for(tmp = 0, i = 0; i < 65536/sizeof(tmp) && file.read((char*)&tmp, sizeof(tmp)); i++, hash += tmp) ;
+    for(tmp = 0, i = 0; i < 65536/sizeof(tmp) && file.read((char*)&tmp, sizeof(tmp)); i++, hash += tmp)
+        ;
 
     m_infoList->setCheckSum(QString("%1").arg(hash, 16, 16, QChar('0')));
 

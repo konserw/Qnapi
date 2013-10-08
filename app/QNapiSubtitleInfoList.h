@@ -24,7 +24,7 @@ public:
     bool subtitlesTmpExist() const;
     QString subtitlesTmp() const;
     void setSubtitlesTmp(const QString &subtitlesTmp);
-#ifdef NOT_EMBED_PYTHON
+#ifndef EMBED_PYTHON
     QString scriptPath() const;
     void setScriptPath(const QString &scriptPath);
 #endif
@@ -40,7 +40,7 @@ public:
     void addChild(const QString& url);
 
 protected:
-#ifdef NOT_EMBED_PYTHON
+#ifndef EMBED_PYTHON
     // sciezka do pliku skryptu konwertujacego
     QString m_scriptPath;
 #endif

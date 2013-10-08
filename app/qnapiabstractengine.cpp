@@ -15,11 +15,17 @@
 #include "qnapiconfig.h"
 #include "qnapisubtitleinfo.h"
 #include "QNapiSubtitleInfoList.h"
-#include <QApplication>
-#include <Python.h>
+
 #include <QTextCodec>
 #include <QTextStream>
 #include <QProcess>
+
+#ifdef EMBED_PYTHON
+#include <QMutexLocker>
+#include <QApplication>
+#include <Python.h>
+const char* QNapiAbstractEngine::m_appPath = nullptr;
+#endif
 
 const char* const QNapiAbstractEngine::m_convertScript =
 R"delim(
@@ -73,7 +79,7 @@ QNapiAbstractEngine::~QNapiAbstractEngine()
             QFile::remove(i->tmpPackedFile());
         if(QFile::exists(i->subtitlesTmp()))
             QFile::remove(i->subtitlesTmp());
-#ifdef NOT_EMBED_PYTHON
+#ifndef EMBED_PYTHON
         if(QFile::exists(i->scriptPath()))
             QFile::remove(i->scriptPath());
 #endif
@@ -95,7 +101,14 @@ bool QNapiAbstractEngine::convert(const QNapiSubtitleInfo &info)
     else framerate = "FPS_29_970";
 
     QString program = QString(m_convertScript).arg(info.subtitlesTmp()).arg(info.subtitlesPath()).arg(framerate);
-#ifdef NOT_EMBED_PYTHON
+
+#ifdef EMBED_PYTHON
+    QMutexLocker lock(&m_mutex);
+    Py_SetProgramName(const_cast<char*>(m_appPath));  /* optional but recommended */
+    Py_Initialize();
+    PyRun_SimpleString(program.toStdString().c_str());
+    Py_Finalize();
+#else
     QFile ff(info.scriptPath());
     if(!ff.open(QFile::WriteOnly | QFile::Truncate))
     {
@@ -109,12 +122,8 @@ bool QNapiAbstractEngine::convert(const QNapiSubtitleInfo &info)
     process.start("python", QStringList() << info.scriptPath());
     if(!process.waitForFinished(5000))
         return false;
-#else
-    Py_SetProgramName(const_cast<char*>(qApp->applicationFilePath().toStdString().c_str()));  /* optional but recommended */
-    Py_Initialize();
-    PyRun_SimpleString(program.toStdString().c_str());
-    Py_Finalize();
 #endif
+
     return QFile::exists(info.subtitlesPath());
 }
 
@@ -205,6 +214,10 @@ bool QNapiAbstractEngine::removeLinesContainingWords(QStringList wordList, const
 // Zmienia uprawnienia do pliku z napisami
 bool QNapiAbstractEngine::changeSubtitlesPermissions(QFile::Permissions permissions, const QNapiSubtitleInfo& info)
 {
+#ifdef EMBED_PYTHON
+    if(m_appPath == nullptr)
+        m_appPath = qApp->applicationFilePath().toStdString().c_str();
+#endif
     if(!info.subtitlesExist())
 		return false;
 

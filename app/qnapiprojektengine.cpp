@@ -137,7 +137,6 @@ bool QNapiProjektEngine::unpack(const QNapiSubtitleInfo &info)
     QProcess p7zip;
     p7zip.start(GlobalConfig().p7zipPath(), args);
 
-    // Rozpakowujemy napisy max w ciagu 5 sekund
     if(!p7zip.waitForFinished(5000)) return false;
 
     return QFile::exists(info.subtitlesTmp());

@@ -72,7 +72,9 @@ QNapi::QNapi(int argc, char **argv)
         QFileInfo fi(p);
         if(fi.isDir())
         {
-            m_movies << QDir(p).entryList(QStringList() << "*.mp4" << "*.avi" << "*.mkv" << "*.mpg" << "*.mov" << "*.vob");
+            QFileInfoList l = QDir(p).entryInfoList(QStringList() << "*.mp4" << "*.avi" << "*.mkv" << "*.mpg" << "*.mov" << "*.vob");
+            foreach(QFileInfo i, l)
+                m_movies << i.absoluteFilePath();
         }
         else if(fi.isFile())
             m_movies.append(p);
@@ -177,7 +179,7 @@ int QNapi::exec()
 
     // Create a QFutureWatcher and connect signals and slots.
     QFutureWatcher<QNapiComplexResult> futureWatcher;
-  //  QObject::connect(&futureWatcher, SIGNAL(finished()), &dialog, SLOT(close()));
+    QObject::connect(&futureWatcher, SIGNAL(finished()), &dialog, SLOT(close()));
     QObject::connect(&dialog, SIGNAL(canceled()), &futureWatcher, SLOT(cancel()));
     QObject::connect(&futureWatcher, SIGNAL(progressValueChanged(int)), &dialog, SLOT(setValue(int)));
 
