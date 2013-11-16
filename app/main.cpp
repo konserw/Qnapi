@@ -17,6 +17,7 @@
 #include <QLibraryInfo>
 #include <QtDebug>
 #include <QDir>
+#include <QFile>
 #include "qnapiconfig.h"
 #include "qnapi.h"
 
@@ -39,12 +40,12 @@ int main(int argc, char **argv)
 	{
     */
         QNapi app(argc, argv);
-
+#ifndef NO_TRANSLATION
 		QString resourceDir = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
 		QTranslator cuteTranslator;
 		cuteTranslator.load("qt_" + QLocale::system().name(), resourceDir);
 		app.installTranslator(&cuteTranslator);
-
+#endif
         return app.exec();
     //}
 }

@@ -31,8 +31,6 @@ public:
     bool unpack(const QNapiSubtitleInfo &info);
 
 private:
-
-
 	QString npFDigest(const QString & input);
     QString npLangWrapper(QNapiLanguage l);
 

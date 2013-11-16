@@ -3,9 +3,11 @@ TEMPLATE = app
 DEFINES += VERSION=1.7
 #DEFINES += EMBED_PYTHON
 
-QT += network xml widgets core concurrent
+QT += network xml widgets concurrent #core
 
-CONFIG += qt c++11 warn_on #release
+CONFIG += qt c++11 warn_on release
+
+DEFINES += NO_TRANSLATION
 
 #QMAKE_CXXFLAGS += -mno-sse
 
