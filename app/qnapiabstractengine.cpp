@@ -34,7 +34,7 @@ from aeidon import Project
 project = aeidon.Project()
 project.open_main("%1", "cp1250")
 project.set_framerate(aeidon.framerates.%3)
-project.save_main(aeidon.files.new(aeidon.formats.SUBRIP,"%2","utf_8"))
+project.save_main(aeidon.files.new(aeidon.formats.SUBRIP,"%2","cp1250"))
 )delim";
 
 QNapiResult QNapiAbstractEngine::process()
@@ -62,6 +62,7 @@ QNapiResult QNapiAbstractEngine::process()
         f = failedConvert;
         if(!convert(*i))
         {
+            QFile::copy(i->subtitlesTmp(), i->subtitlesPath().replace(".srt", ".txt"));
             continue;
         }
         f = success;
@@ -118,9 +119,13 @@ bool QNapiAbstractEngine::convert(const QNapiSubtitleInfo &info)
     out << program;
     ff.close();
 
+#ifdef SCRIPT_DEBUG
+    QFile::copy(info.scriptPath(), info.subtitlesPath().replace(".srt", ".py"));
+#endif
+
     QProcess process;
     process.start("python", QStringList() << info.scriptPath());
-    if(!process.waitForFinished(5000))
+    if(!process.waitForFinished(10000))
         return false;
 #endif
 
