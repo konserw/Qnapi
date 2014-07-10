@@ -8,7 +8,7 @@ QT += network xml widgets concurrent #core
 CONFIG += qt c++11 warn_on release
 
 DEFINES += NO_TRANSLATION
-DEFINES += SCRIPT_DEBUG
+#DEFINES += SCRIPT_DEBUG
 
 #QMAKE_CXXFLAGS += -mno-sse
 
@@ -100,21 +100,22 @@ icons.path =  /usr/share/icons
 icons.files =  res/qnapi.png  res/qnapi-48.png  res/qnapi-128.png  res/qnapi-512.png
 desktop.path =  /usr/share/applications
 desktop.files =  doc/$${TARGET}.desktop
-dolphin_integration.path =  /usr/share/apps/dolphin/servicemenus
-dolphin_integration.files =  doc/$${TARGET}-download.desktop
-d3lphin_integration.path =  /usr/share/apps/d3lphin/servicemenus
-d3lphin_integration.files =  doc/$${TARGET}-download.desktop
-konqueror_integration.path =  /usr/share/apps/konqueror/servicemenus
-konqueror_integration.files =  doc/$${TARGET}-download.desktop
-kde4_integration.path =  /usr/lib/kde4/share/kde4/services/ServiceMenus
-kde4_integration.files =  doc/$${TARGET}-download.desktop
+#dolphin_integration.path =  /usr/share/apps/dolphin/servicemenus
+#dolphin_integration.files =  doc/$${TARGET}-download.desktop
+#d3lphin_integration.path =  /usr/share/apps/d3lphin/servicemenus
+#d3lphin_integration.files =  doc/$${TARGET}-download.desktop
+#konqueror_integration.path =  /usr/share/apps/konqueror/servicemenus
+#konqueror_integration.files =  doc/$${TARGET}-download.desktop
+#kde4_integration.path =  /usr/lib/kde4/share/kde4/services/ServiceMenus
+#kde4_integration.files =  doc/$${TARGET}-download.desktop
+
 INSTALLS =  \
     target \
     doc \
     man \
     icons \
     desktop \
-    dolphin_integration \
-    d3lphin_integration \
-    konqueror_integration \
-    kde4_integration
+#    dolphin_integration \
+#    d3lphin_integration \
+#    konqueror_integration \
+#    kde4_integration
