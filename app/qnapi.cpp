@@ -53,33 +53,34 @@ QNapi::QNapi(int argc, char **argv)
     m_showSettings = false;
     m_run = true;
 
-    QStringList args;
+    QStringList args = this->arguments();
+/*
     for(int i=0; i<argc; ++i)
     {
         if(i==0)
             continue;
         args.append(QString(argv[i]));
     }
+*/
+    QString argument;
 
-    QString p;
-
-    for(int i=0; i < args.size(); ++i)
+    for(int i=1; i < args.size(); ++i)
     {
-        p = args[i];
-        if(p.startsWith("file://"))
-            p = p.remove(0, 7);
+        argument = args[i];
+        if(argument.startsWith("file://"))
+            argument = argument.remove(0, 7);
 
-        QFileInfo fi(p);
+        QFileInfo fi(argument);
         if(fi.isDir())
         {
-            QFileInfoList l = QDir(p).entryInfoList(QStringList() << "*.mp4" << "*.avi" << "*.mkv" << "*.mpg" << "*.mov" << "*.vob");
+            QFileInfoList l = QDir(argument).entryInfoList(QStringList() << "*.mp4" << "*.avi" << "*.mkv" << "*.mpg" << "*.mov" << "*.vob");
             foreach(QFileInfo i, l)
                 m_movies << i.absoluteFilePath();
         }
         else if(fi.isFile())
-            m_movies.append(p);
+            m_movies.append(argument);
 
-        if((p == "-l") || (p == "--language"))
+        if((argument == "-l") || (argument == "--language"))
         {
             ++i;
             if(i < args.size())
@@ -139,7 +140,7 @@ bool QNapi::checkAll()
 
     foreach(QString movie, m_movies)
     {
-        flag = flag && QFileInfo(QDir(movie).absolutePath()).isWritable();
+        flag = flag && QFileInfo(QFileInfo(movie).absolutePath()).isWritable();
     }
 
     if(!flag)
