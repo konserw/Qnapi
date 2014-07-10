@@ -125,7 +125,7 @@ bool QNapiAbstractEngine::convert(const QNapiSubtitleInfo &info)
 
     QProcess process;
     process.start("python", QStringList() << info.scriptPath());
-    if(!process.waitForFinished(10000))
+    if(!process.waitForFinished(100000))
         return false;
 #endif
 
