@@ -91,6 +91,9 @@ QNapiAbstractEngine::~QNapiAbstractEngine()
 
 bool QNapiAbstractEngine::convert(const QNapiSubtitleInfo &info)
 {
+#ifdef NO_CONVERT
+    return false;
+#endif
     if(!info.subtitlesTmpExist())
         return false;
 

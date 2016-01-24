@@ -1,3 +1,5 @@
+#bnuild artifacts
+build/
 # Compiled Object files
 *.slo
 *.lo

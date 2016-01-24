@@ -7,7 +7,7 @@ QT += network xml widgets concurrent #core
 
 CONFIG += qt c++11 warn_on release
 
-DEFINES += NO_TRANSLATION
+DEFINES += NO_TRANSLATION NO_CONVERT
 #DEFINES += SCRIPT_DEBUG
 
 #QMAKE_CXXFLAGS += -mno-sse
