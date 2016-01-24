@@ -139,7 +139,7 @@ bool QNapiProjektEngine::unpack(const QNapiSubtitleInfo &info)
 
     if(!p7zip.waitForFinished(5000)) return false;
 
-    return QFile::exists(info.subtitlesTmp());
+    return info.subtitlesTmpExist();
 }
 
 // Tajemnicza funkcja f()

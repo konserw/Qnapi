@@ -56,10 +56,7 @@ public:
     { return m_parent->subtitlesTmpExist(); }
     QString subtitlesTmp() const
     { return m_parent->subtitlesTmp(); }
-#ifndef EMBED_PYTHON
-    QString scriptPath() const
-    { return m_parent->scriptPath(); }
-#endif
+
 protected:
     //url do napisow
     QString m_url;

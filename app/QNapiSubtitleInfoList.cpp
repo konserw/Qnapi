@@ -51,9 +51,6 @@ void QNapiSubtitleInfoList::setCheckSum(const QString &checkSum)
 {
     m_checkSum = checkSum;
     m_subtitlesTmp = QString("%1/%2.txt").arg(m_tmpPath, m_checkSum);
-#ifndef EMBED_PYTHON
-    m_scriptPath = QString("%1/%2.py").arg(m_tmpPath, m_checkSum);
-#endif
 }
 
 QNapiLanguage QNapiSubtitleInfoList::lang() const
@@ -97,7 +94,7 @@ void QNapiSubtitleInfoList::addChild(const QString &url)
     if(!m_children.isEmpty())
         suffix = QString("_%1").arg(QString::number(m_children.size()).rightJustified(2, '0'));
 
-    child->setSubtitlesPath(QString("%1/%2%3.srt").arg(movieDir(), movieName(), suffix));
+    child->setSubtitlesPath(QString("%1/%2%3.txt").arg(movieDir(), movieName(), suffix));
 
     m_children.append(child);
 }
@@ -116,15 +113,3 @@ void QNapiSubtitleInfoList::setSubtitlesTmp(const QString &subtitlesTmp)
 {
     m_subtitlesTmp = subtitlesTmp;
 }
-
-#ifndef EMBED_PYTHON
-QString QNapiSubtitleInfoList::scriptPath() const
-{
-    return m_scriptPath;
-}
-
-void QNapiSubtitleInfoList::setScriptPath(const QString &scriptPath)
-{
-    m_scriptPath = scriptPath;
-}
-#endif

@@ -152,7 +152,7 @@ bool QOpenSubtitlesEngine::unpack(const QNapiSubtitleInfo &info)
     // Rozpakowujemy napisy max w ciagu 5 sekund
     if(!p7zip.waitForFinished(5000)) return false;
 
-    return QFile::exists(info.subtitlesTmp());
+    return info.subtitlesTmpExist();
 }
 
 bool QOpenSubtitlesEngine::login()

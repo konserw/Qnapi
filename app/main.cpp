@@ -70,8 +70,7 @@ void sigHandler(int /*sig*/)
 
 	QStringList filters;
 	filters << "QNapi-*-rc";
-	filters << "QNapi.*.tmp";
-    filters << "convert.py";
+    filters << "QNapi.*.tmp";
 
 	QDir dir(tmpPath);
 

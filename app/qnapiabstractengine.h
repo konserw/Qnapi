@@ -18,9 +18,6 @@
 #include <QString>
 #include <QStringList>
 #include <QFile>
-#ifdef EMBED_PYTHON
-#include <QMutex>
-#endif
 #include "qnapilanguage.h"
 #include "QNapiResult.h"
 
@@ -44,26 +41,19 @@ public:
     virtual bool download(const QNapiSubtitleInfo &info) = 0;
     // powinna rozpakowywac pobrane napisy
     virtual bool unpack(const QNapiSubtitleInfo &info) = 0;
-    // konwersja na srt
-    virtual bool convert(const QNapiSubtitleInfo &info);
     //post proces
-    virtual void pp(const QNapiSubtitleInfo &info);
+    virtual bool pp(const QNapiSubtitleInfo &info);
     // usuwa linie z pliku zawierajace conajmniej jedno z podanej listy slow
     bool removeLinesContainingWords(QStringList wordList, const QNapiSubtitleInfo &info);
     // zmienia uprawnienia do pliku z napisami      
     bool changeSubtitlesPermissions(QFile::Permissions permissions, const QNapiSubtitleInfo &info);
+    //move temp subtitles to proper path
+    virtual bool move(const QNapiSubtitleInfo& info);
 protected:
 	// konstruktor klasy
     QNapiAbstractEngine(const QString & movieFile, const QNapiLanguage &lang);
 
     QNapiSubtitleInfoList* m_infoList;
-
-    static const char* const m_convertScript;
-
-#ifdef EMBED_PYTHON
-    static const char* m_appPath;
-    QMutex m_mutex;
-#endif
 };
 
 #endif

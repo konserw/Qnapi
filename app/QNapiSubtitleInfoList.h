@@ -24,10 +24,7 @@ public:
     bool subtitlesTmpExist() const;
     QString subtitlesTmp() const;
     void setSubtitlesTmp(const QString &subtitlesTmp);
-#ifndef EMBED_PYTHON
-    QString scriptPath() const;
-    void setScriptPath(const QString &scriptPath);
-#endif
+
     QNapiLanguage lang() const;
     void setLang(const QNapiLanguage &lang);
 
@@ -40,10 +37,6 @@ public:
     void addChild(const QString& url);
 
 protected:
-#ifndef EMBED_PYTHON
-    // sciezka do pliku skryptu konwertujacego
-    QString m_scriptPath;
-#endif
     // sciezka do tymczasowego pliku z napisami
     QString m_subtitlesTmp;
     // sciezka do pliku filmowego

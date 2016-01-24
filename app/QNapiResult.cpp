@@ -67,8 +67,8 @@ QString QNapiComplexResult::parseResult(const QNapiResult& res)
         return QObject::tr("Failed to download subtitles");
     case failedUnpack:
         return QObject::tr("Failed to unpack downloaded subtitles");
-    case failedConvert:
-        return QObject::tr("Failed to execute txt->srt conversion script");
+    case failedPostProcess:
+        return QObject::tr("Failed post processing");
     case failed:
         return QObject::tr("Failed, unknown reason");
     case notRun:

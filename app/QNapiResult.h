@@ -9,7 +9,7 @@ enum QNapiResult
     failedLook,
     failedDownload,
     failedUnpack,
-    failedConvert,
+    failedPostProcess,
     failed,
     notRun
 };
